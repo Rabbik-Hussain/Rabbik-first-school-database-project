@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>লার্নিং স্কুল - ফি ও হিসাব ব্যবস্থাপনা সিস্টেম</title>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- External CSS -->
+  <link rel="stylesheet" href="login.css">
+</head>
+<body>
+
+  <div class="form-container">
+    
+    <!-- LOGIN FORM -->
+    <div class="form-box login-box active" id="loginForm">
+      <h2>Login Form</h2>
+      
+      <div class="toggle-bar">
+        <button class="toggle-btn active" onclick="showLogin()">Login</button>
+        <button class="toggle-btn" onclick="showSignup()">Signup</button>
+      </div>
+
+      <form id="loginFormElement">
+        <div class="input-group">
+          <input type="text" id="loginTeacherId" placeholder="Teacher ID" required>
+          <i class="fa-solid fa-id-badge" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #555;"></i>
+        </div>
+
+        <div class="input-group">
+          <input type="password" id="loginPassword" placeholder="Password" required>
+          <i class="fa-solid fa-eye toggle-password" onclick="togglePasswordVisibility('loginPassword', this)"></i>
+        </div>
+
+        <a class="forgot-pass" onclick="showForgot()">Forgot password?</a>
+
+        <button type="submit" class="submit-btn-login">Login</button>
+
+        <div class="bottom-text">
+          Not a member? <a onclick="showSignup()">Signup now</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- REGISTRATION FORM -->
+    <div class="form-box signup-box" id="signupForm">
+      <h2>Responsive Registration Form</h2>
+
+      <form id="signupFormElement">
+        <!-- Profile Picture Upload -->
+        <div style="margin-bottom: 15px;">
+          <label class="upload-label">Upload Your Profile Picture</label>
+          <div class="icon-input" style="margin-bottom: 0;">
+            <i class="fa-solid fa-camera"></i>
+            <input type="file" id="regProfilePic" accept="image/*" required style="padding-top: 8px;">
+          </div>
+        </div>
+
+        <!-- Teacher ID -->
+        <div class="icon-input">
+          <i class="fa-solid fa-id-badge"></i>
+          <input type="text" id="regTeacherId" placeholder="Teacher ID" required>
+        </div>
+
+        <!-- Password -->
+        <div class="icon-input">
+          <i class="fa-solid fa-lock"></i>
+          <input type="password" id="regPassword" placeholder="Password" required>
+          <i class="fa-solid fa-eye toggle-password" style="left: auto; right: 12px;" onclick="togglePasswordVisibility('regPassword', this)"></i>
+        </div>
+
+        <!-- Re-type Password -->
+        <div class="icon-input">
+          <i class="fa-solid fa-lock"></i>
+          <input type="password" id="regConfirmPassword" placeholder="Re-type Password" required>
+          <i class="fa-solid fa-eye toggle-password" style="left: auto; right: 12px;" onclick="togglePasswordVisibility('regConfirmPassword', this)"></i>
+        </div>
+
+        <!-- First & Last Name -->
+        <div class="name-fields">
+          <div class="icon-input" style="flex: 1;">
+            <i class="fa-solid fa-user"></i>
+            <input type="text" id="regFirstName" placeholder="First Name" required>
+          </div>
+          <div class="icon-input" style="flex: 1;">
+            <i class="fa-solid fa-user"></i>
+            <input type="text" id="regLastName" placeholder="Last Name" required>
+          </div>
+        </div>
+
+        <!-- Designation -->
+        <div class="icon-input">
+          <i class="fa-solid fa-briefcase"></i>
+          <select id="designationSelect" onchange="toggleClassField()" required style="color: #666;">
+            <option value="" disabled selected>Select Designation</option>
+            <option value="head_teacher">প্রধান শিক্ষক (Head Teacher)</option>
+            <option value="assistant_teacher">সহকারী শিক্ষক (Assistant Teacher)</option>
+            <option value="class_teacher">শ্রেণি শিক্ষক (Class Teacher)</option>
+          </select>
+        </div>
+
+        <!-- Which Class -->
+        <div class="icon-input hidden" id="classField">
+          <i class="fa-solid fa-school"></i>
+          <select id="classSelect" style="color: #666;">
+            <option value="" disabled selected>Which Class</option>
+            <option value="Play">Play</option>
+            <option value="Nursery">Nursery</option>
+            <option value="1">Class 1</option>
+            <option value="2">Class 2</option>
+            <option value="3">Class 3</option>
+            <option value="4">Class 4</option>
+            <option value="5">Class 5</option>
+          </select>
+        </div>
+
+        <!-- Signature Upload with Label -->
+        <div style="margin-bottom: 15px;">
+          <label class="upload-label">Upload Your Signature</label>
+          <div class="icon-input" style="margin-bottom: 0;">
+            <i class="fa-solid fa-signature"></i>
+            <input type="file" id="regSignature" accept="image/*" required style="padding-top: 8px;">
+          </div>
+        </div>
+
+        <!-- Password Hint / Clue Field -->
+        <div class="icon-input">
+          <i class="fa-solid fa-lightbulb"></i>
+          <input type="text" id="regHint" placeholder="Password Hint (e.g., Favorite pet name)" required>
+        </div>
+
+        <!-- Gender Radio Buttons -->
+        <div class="radio-group" style="margin-top: 15px;">
+          <label><input type="radio" name="gender" value="male" checked> Male</label>
+          <label><input type="radio" name="gender" value="female"> Female</label>
+        </div>
+
+        <!-- Checkboxes -->
+        <div class="checkbox-group">
+          <input type="checkbox" id="terms" required>
+          <label for="terms">I agree with terms and conditions</label>
+        </div>
+
+        <!-- Register Button -->
+        <button type="submit" class="submit-btn-signup">Register</button>
+
+        <div class="back-to-login">
+          Already have an account? <a onclick="showLogin()">Login</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- FORGOT PASSWORD FORM -->
+    <div class="form-box" id="forgotForm">
+      <h2>Reset Password</h2>
+      <form id="forgotFormElement">
+        <div class="input-group">
+          <input type="text" id="forgotTeacherId" placeholder="Enter Teacher ID" required>
+          <i class="fa-solid fa-id-badge" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #555;"></i>
+        </div>
+        <div class="input-group">
+          <input type="text" id="forgotHint" placeholder="Enter Password Hint/Clue" required>
+          <i class="fa-solid fa-lightbulb" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #555;"></i>
+        </div>
+        <div class="input-group">
+          <input type="password" id="newPassword" placeholder="New Password" required>
+          <i class="fa-solid fa-eye toggle-password" onclick="togglePasswordVisibility('newPassword', this)"></i>
+        </div>
+        <button type="submit" class="submit-btn-login">Update Password</button>
+        <div class="bottom-text">
+          <a onclick="showLogin()">Back to Login</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- DEMO DASHBOARD AFTER LOGIN -->
+    <div class="form-box dashboard-box" id="dashboardBox">
+      <div id="dashboardProfileContainer"></div>
+      <h2>Welcome, <span id="welcomeName">Teacher</span>!</h2>
+      <p>You have successfully logged in.</p>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+  </div>
+
+  <!-- External JavaScript -->
+  <script src="login.js"></script>
+
+</body>
+</html>

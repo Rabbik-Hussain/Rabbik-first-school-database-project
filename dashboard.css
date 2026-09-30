@@ -1,0 +1,705 @@
+@import url('https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap');
+
+/* ==========================================
+   1. BASE STYLES & FONTS
+   ========================================== */
+* {
+    box-sizing: border-box;
+    font-family: 'Tiro Bangla', serif;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #f3f4f6;
+    margin: 0;
+    padding: 0;
+    color: #1f2937;
+    overflow-x: hidden;
+}
+
+@media print {
+    .no-print { display: none !important; }
+    .print-area { display: block !important; }
+}
+
+.logo img{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    padding: 5px;
+    margin: 5px 0;
+}
+
+.logo-21 img{
+    width: 150px;
+    height: 130px;
+    border-radius: 50%;
+    padding: 5px;
+    margin: 5px 0;
+}
+
+/* ==========================================
+   2. GENERAL TABLE & BUTTON STYLES
+   ========================================== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+}
+
+th, td {
+    border: 1px solid #e5e7eb;
+    padding: 8px;
+    text-align: center;
+}
+
+th {
+    background-color: #1e3a8a;
+    color: #ffffff;
+}
+
+.btn-primary {
+    background-color: #1e3a8a;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: #1d4ed8;
+}
+
+.btn-success {
+    background-color: #16a34a;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.2s;
+}
+
+.btn-success:hover {
+    background-color: #15803d;
+}
+
+.due-tag {
+    color: #dc2626;
+    font-weight: bold;
+}
+
+
+/* ==========================================
+   3. RECEIPT & SIGNATURE STYLING
+   ========================================== */
+.receipt-box {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 6px;
+    background: #fafafa;
+}
+
+/* রশিদের সিগনেচার বক্স: সম্পূর্ণ রশিদের ভেতরে এবং নিখুঁতভাবে অ্যাডজাস্ট করা (৪০% করে মোট ৮০%, মাঝে গ্যাপ) */
+.signature-flex-container {
+    display: flex;
+    justify-content: space-between;
+    width: 80%;
+    margin: 40px auto 10px auto;
+}
+
+.sig-box {
+    width: 40%;
+    border-top: 1px dashed #333;
+    text-align: center;
+    padding-top: 5px;
+    font-size: 14px;
+    color: #333;
+}
+
+/* সিগনেচার বক্সের ভেতরের ইনপুট বা সিলেক্ট বক্সের ডিজাইন রশিদের ভেতরে রাখার জন্য */
+.sig-box input, 
+.sig-box select {
+    width: 100%;
+    padding: 4px;
+    margin-bottom: 5px;
+    font-family: 'Tiro Bangla', serif;
+    font-size: 13px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: center;
+}
+
+/* প্রতি মাসের হিসাব তালিকার শেষে প্রধান শিক্ষকের স্বাক্ষর বক্স */
+.list-headmaster-sig {
+    margin-top: 30px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.list-headmaster-sig .sig-box {
+    width: 35%;
+}
+
+
+/* ==========================================
+   4. INFORMATION CARD HOVER EFFECT (নতুন আপডেট)
+   ========================================== */
+/* ইনফরমেশন পেজের কার্ডগুলোর বেস ট্রানজিশন ও শ্যাডো */
+.info-card {
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* হোভার করার সময় ব্যাকগ্রাউন্ড পরিবর্তন, ফন্ট বোল্ড, কালার পরিবর্তন, স্কেল এবং ইনসেট শ্যাডো */
+.info-card:hover {
+    background-color: #eef2ff; /* সুন্দর মানানসই হালকা ব্যাকগ্রাউন্ড কালার */
+    color: #1e3a8a; /* ফন্টের কালার ব্যাকগ্রাউন্ডের সাথে সামঞ্জস্যপূর্ণ */
+    font-weight: bold; /* ফন্ট একটু বোল্ড হবে */
+    transform: scale(0.99); /* ভেতরের দিকে একটু চলে যাওয়ার অনুভূতি বা স্কেল */
+    box-shadow: inset 0 4px 10px rgba(30, 58, 138, 0.25); /* ইনসেট বা ভেতরের দিকে বক্স শ্যাডো */
+}
+
+
+/* ==========================================
+   5. RESPONSIVE MEDIA QUERIES (রেসপন্সিভ ডিজাইন)
+   ========================================== */
+
+/* ১. Desktop / Large Screens (992px এর উপরে) */
+@media screen and (min-width: 992px) {
+    .max-w-7xl {
+        max-width: 80rem;
+    }
+}
+
+/* ২. Tablet / Medium Screens (768px থেকে 992px এর ভেতর) */
+@media screen and (min-width: 768px) and (max-width: 991px) {
+    .max-w-7xl {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+}
+
+/* ৩. Mobile / Large Phone Screens (400px থেকে 768px এর ভেতর) */
+@media screen and (min-width: 400px) and (max-width: 767px) {
+    body {
+        font-size: 14px;
+    }
+
+    nav .max-w-7xl {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+
+    header.flex {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .overflow-x-auto {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .overflow-x-auto table th, 
+    .overflow-x-auto table td {
+        padding: 6px 3px;
+        font-size: 10px;
+        white-space: nowrap;
+    }
+
+    table:not(.overflow-x-auto table) th,
+    table:not(.overflow-x-auto table) td {
+        white-space: normal;
+        word-break: break-word;
+        font-size: 12px;
+        padding: 6px;
+    }
+}
+
+/* ৪. Extra Small Mobile Screens (400px এর নিচে সবচেয়ে ছোট স্ক্রিন) */
+@media screen and (max-width: 399px) {
+    body {
+        font-size: 13px;
+    }
+
+    nav .flex.space-x-6 {
+        gap: 6px;
+        font-size: 11px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    header.flex {
+        padding: 10px;
+    }
+
+    header h1 {
+        font-size: 20px !important;
+    }
+
+    header p {
+        font-size: 10px !important;
+    }
+
+    .overflow-x-auto {
+        width: 100%;
+        overflow-x: auto;
+        display: block;
+    }
+
+    .overflow-x-auto table {
+        min-width: 620px;
+    }
+
+    .overflow-x-auto table th, 
+    .overflow-x-auto table td {
+        padding: 4px 2px;
+        font-size: 9px;
+        white-space: nowrap;
+    }
+
+    table:not(.overflow-x-auto table) th,
+    table:not(.overflow-x-auto table) td {
+        white-space: normal;
+        word-break: break-word;
+        font-size: 11px;
+        padding: 4px;
+    }
+
+    .btn-primary, .btn-success {
+        padding: 6px 10px;
+        font-size: 11px;
+        width: 100%;
+        margin-top: 4px;
+    }
+
+    .max-w-md, .max-w-lg, .max-w-2xl, .max-w-4xl {
+        width: 92% !important;
+        margin: 0 auto;
+        padding: 10px !important;
+    }
+}
+
+
+/* ==========================================
+   6. RECEIPT ACTION BUTTONS - RESPONSIVE GRID
+   ========================================== */
+
+/*
+   শুধুমাত্র Receipt Preview-এর action buttons-এর জন্য।
+   অন্য কোনো dashboard button এখানে প্রভাবিত হবে না।
+
+   Button order:
+   1 = Paid
+   2 = Update
+   3 = Edit
+   4 = Unpaid
+   5 = PDF
+
+   Layout:
+   Paid / Update | Unpaid
+   Edit          | PDF
+*/
+
+/* ------------------------------------------
+   950px এর উপরে - Large Desktop
+   ------------------------------------------ */
+@media screen and (min-width: 951px) {
+
+    #sec-receiptpreview > .no-print {
+        width: min(100%, 896px);
+        max-width: 896px;
+        margin-left: auto;
+        margin-right: auto;
+
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-rows: auto auto;
+
+        gap: 8px 12px;
+
+        justify-content: center;
+        align-items: center;
+    }
+
+    #sec-receiptpreview > .no-print > button {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+
+        padding: 7px 10px;
+        font-size: 13px;
+        line-height: 1.3;
+
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        margin: 0 !important;
+    }
+
+    /* Paid */
+    #sec-receiptpreview > .no-print > #btnReceiptPaid {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    /* Update - Paid-এর জায়গাতেই থাকবে */
+    #sec-receiptpreview > .no-print > #btnReceiptUpdate {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    /* Edit */
+    #sec-receiptpreview > .no-print > button:nth-child(3) {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    /* Unpaid */
+    #sec-receiptpreview > .no-print > button:nth-child(4) {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    /* PDF */
+    #sec-receiptpreview > .no-print > button:nth-child(5) {
+        grid-column: 2;
+        grid-row: 2;
+    }
+}
+
+
+/* ------------------------------------------
+   680px - 950px
+   ------------------------------------------ */
+@media screen and (min-width: 680px) and (max-width: 950px) {
+
+    #sec-receiptpreview > .no-print {
+        width: min(100%, 850px);
+        max-width: 850px;
+        margin-left: auto;
+        margin-right: auto;
+
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-rows: auto auto;
+
+        gap: 7px 10px;
+
+        justify-content: center;
+        align-items: center;
+    }
+
+    #sec-receiptpreview > .no-print > button {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+
+        padding: 6px 9px;
+        font-size: 12px;
+        line-height: 1.3;
+
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        margin: 0 !important;
+    }
+
+    #sec-receiptpreview > .no-print > #btnReceiptPaid {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    #sec-receiptpreview > .no-print > #btnReceiptUpdate {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    #sec-receiptpreview > .no-print > button:nth-child(3) {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    #sec-receiptpreview > .no-print > button:nth-child(4) {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    #sec-receiptpreview > .no-print > button:nth-child(5) {
+        grid-column: 2;
+        grid-row: 2;
+    }
+}
+
+
+/* ------------------------------------------
+   460px - 679px
+   ------------------------------------------ */
+@media screen and (min-width: 460px) and (max-width: 679px) {
+
+    #sec-receiptpreview > .no-print {
+        width: calc(100% - 20px);
+        max-width: 650px;
+        margin-left: auto;
+        margin-right: auto;
+
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-rows: auto auto;
+
+        gap: 6px 7px;
+
+        justify-content: center;
+        align-items: center;
+    }
+
+    #sec-receiptpreview > .no-print > button {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+
+        padding: 6px 6px;
+        font-size: 11px;
+        line-height: 1.25;
+
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        margin: 0 !important;
+    }
+
+    #sec-receiptpreview > .no-print > #btnReceiptPaid {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    #sec-receiptpreview > .no-print > #btnReceiptUpdate {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    #sec-receiptpreview > .no-print > button:nth-child(3) {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    #sec-receiptpreview > .no-print > button:nth-child(4) {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    #sec-receiptpreview > .no-print > button:nth-child(5) {
+        grid-column: 2;
+        grid-row: 2;
+    }
+}
+
+
+/* ------------------------------------------
+   400px - 459px
+   ------------------------------------------ */
+@media screen and (min-width: 400px) and (max-width: 459px) {
+
+    #sec-receiptpreview > .no-print {
+        width: calc(100% - 16px);
+        max-width: 440px;
+        margin-left: auto;
+        margin-right: auto;
+
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-rows: auto auto;
+
+        gap: 5px 6px;
+
+        justify-content: center;
+        align-items: center;
+    }
+
+    #sec-receiptpreview > .no-print > button {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+
+        padding: 5px 5px;
+        font-size: 10px;
+        line-height: 1.2;
+
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        margin: 0 !important;
+        border-radius: 5px;
+    }
+
+    #sec-receiptpreview > .no-print > #btnReceiptPaid {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    #sec-receiptpreview > .no-print > #btnReceiptUpdate {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    #sec-receiptpreview > .no-print > button:nth-child(3) {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    #sec-receiptpreview > .no-print > button:nth-child(4) {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    #sec-receiptpreview > .no-print > button:nth-child(5) {
+        grid-column: 2;
+        grid-row: 2;
+    }
+}
+
+
+/* ------------------------------------------
+   400px এর নিচে - Extra Small Mobile
+   ------------------------------------------ */
+@media screen and (max-width: 399px) {
+
+    #sec-receiptpreview > .no-print {
+        width: calc(100% - 10px);
+        max-width: 390px;
+        margin-left: auto;
+        margin-right: auto;
+
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-rows: auto auto;
+
+        gap: 4px 5px;
+
+        justify-content: center;
+        align-items: center;
+    }
+
+    #sec-receiptpreview > .no-print > button {
+        width: 100% !important;
+        min-width: 0;
+        max-width: 100%;
+
+        padding: 5px 3px !important;
+        font-size: 9px !important;
+        line-height: 1.15;
+
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        margin: 0 !important;
+        border-radius: 5px;
+    }
+
+    #sec-receiptpreview > .no-print > #btnReceiptPaid {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    #sec-receiptpreview > .no-print > #btnReceiptUpdate {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    #sec-receiptpreview > .no-print > button:nth-child(3) {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    #sec-receiptpreview > .no-print > button:nth-child(4) {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    #sec-receiptpreview > .no-print > button:nth-child(5) {
+        grid-column: 2;
+        grid-row: 2;
+    }
+
+
+    /* Navbar - below 400px */
+
+    nav > div {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+    }
+
+    nav > div > div:first-child {
+        width: 100%;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+    }
+
+    nav > div > div:first-child > * {
+        margin-left: 0 !important;
+    }
+
+    nav > div > div:last-child {
+        width: 100%;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    nav > div > div:last-child > * {
+        margin-left: 0 !important;
+    }
+
+    nav > div > div:last-child button {
+        margin: 0 !important;
+    }
+
+}
+
+
+
+/* Navbar - Home & Information button style */
+
+nav > div > div:last-child > button[onclick="showSection('home')"],
+nav > div > div:last-child > button[onclick="showSection('info')"] {
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 8px;
+    padding: 6px 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+    transition: all 0.3s ease;
+}
+
+nav > div > div:last-child > button[onclick="showSection('home')"]:hover,
+nav > div > div:last-child > button[onclick="showSection('info')"]:hover {
+    border-color: rgba(255, 255, 255, 0.75);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.28);
+    transform: translateY(-1px);
+}
+
+
+nav > div > div:last-child > button[onclick="showSection('home')"]:hover,
+nav > div > div:last-child > button[onclick="showSection('info')"]:hover {
+    background: #01ff01;
+    color: #0f172a;
+    border-color: rgba(255, 255, 255, 0.75);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.28);
+    transform: translateY(-1px);
+}

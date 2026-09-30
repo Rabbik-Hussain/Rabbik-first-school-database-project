@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>লার্নিং স্কুল - ফি ও হিসাব ব্যবস্থাপনা সিস্টেম</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <!-- html2pdf -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <!-- Custom Backup CSS -->
+    <link rel="stylesheet" href="dashboard.css">
+
+    <!-- for footer design -->
+     <link rel="stylesheet" href="style.css">
+
+     <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+</head>
+<body class="bg-gray-100 min-h-screen text-gray-800">
+
+    <!-- Navbar -->
+    <nav class="bg-blue-900 text-white shadow-lg no-print">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="logo">
+
+                    <img src="image/logo.jpg" alt="logo">
+                
+                </div>
+                <span class="text-xl font-bold tracking-wide">লার্নিং স্কুল</span>
+
+               <button
+                 type="button"
+                 id="languageToggleBtn"
+                 onclick="toggleLanguage()"
+                 class="ml-2 px-3 py-1.5 rounded-lg border border-yellow-300/70 bg-blue-800 text-yellow-300 text-sm font-bold shadow-md hover:bg-yellow-400 hover:text-blue-950 hover:border-yellow-400 hover:shadow-lg transition-all duration-300 whitespace-nowrap"
+>
+                   English
+            </button>
+
+            </div>
+
+            
+            <div class="flex space-x-6 items-center">
+                <button onclick="showSection('home')" class="hover:text-yellow-400 font-semibold">হোম</button>
+                <button onclick="showSection('info')" class="hover:text-yellow-400 font-semibold">ইনফরমেশন</button>
+                <button onclick="showSection('dashboard')" class="bg-yellow-500 text-blue-900 px-4 py-1.5 rounded-lg font-bold hover:bg-yellow-400 transition">ক্যাশ কাউন্ট</button>
+                <button onclick="logoutFromDashboard()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg font-bold text-sm transition">লগ আউট</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="max-w-7xl mx-auto p-4 md:p-6">
+
+        <!-- Header Banner -->
+        <header class="bg-white rounded-xl shadow-md p-4 mb-6 flex flex-col md:flex-row items-center justify-between text-center md:text-left border-b-4 border-green-600 no-print">
+            <div class="flex items-center space-x-4 mb-3 md:mb-0">
+
+                <div class="logo-21">
+
+                    <img src="image/logo.jpg" alt="logo">
+                
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold text-blue-900">লার্নিং স্কুল</h1>
+                    <p class="text-sm text-gray-600">ছত্তিশ,ফেঞ্চুগঞ্জ, সিলেট। | <br> মোবাইল: ০১৭৩৭-৭৫৭৭৬১</p>
+                    <p class="text-xs text-green-700 font-bold">শিক্ষাই আলো — আলোই শক্তি | স্থাপিত: ২০১৮ইং</p>
+                </div>
+            </div>
+            <div id="syncStatus" class="text-xs bg-green-100 text-green-800 px-3 py-1.5 rounded-full font-semibold border border-green-300">
+                ● লোকাল স্টোরেজ ও ক্লাউড সিঙ্ক সক্রিয় (সেশন: <span id="currentSessionDisplay" class="font-bold">2026</span>)
+            </div>
+        </header>
+
+        <!-- SECTIONS -->
+
+        <!-- A. HOME -->
+        <section id="sec-home" class="space-y-6 no-print">
+            <div class="bg-white p-8 rounded-xl shadow-md text-center">
+                <h2
+                         class="text-2xl font-bold text-blue-900 mb-2"
+                      data-i18n="homePortalTitle"
+>
+                      লার্নিং স্কুল ডিজিটাল পোর্টাল
+                 </h2>
+                <p
+                    class="text-gray-600 mb-6"
+                    data-i18n="homePortalDescription"
+>
+                    সকল প্রকার মাসিক ফি, রসিদ প্রদান ও বকেয়া হিসাব নিয়ন্ত্রণের জন্য "ক্যাশ কাউন্ট" বাটনে চাপ দিন।
+                </p>
+               <button
+                 onclick="showSection('dashboard')"
+                 class="btn-primary"
+                 data-i18n="goToAccounts"
+>
+                     হিসাব সেকশনে যান
+                </button>
+            </div>
+
+            <!-- NEW SESSION CONTROLLER CARD -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Left Sub-Card (1/3 Width): Search Existing Session -->
+                <div class="md:col-span-1 bg-white p-5 rounded-xl shadow-md border-t-4 border-indigo-700 flex flex-col justify-between">
+                    <div>
+                        <h3
+                         class="font-bold text-blue-900 text-base mb-1"
+                          data-i18n="sessionSelectChange"
+>
+                        🔍 সেশন নির্বাচন / পরিবর্তন
+                        </h3>
+                        <p
+                         class="text-xs text-gray-500 mb-3"
+                         data-i18n="sessionSelectDescription"
+>
+                        পুরাতন বা সংরক্ষিত কোনো সেশনের ডাটা দেখতে এখানে সাল লিখুন।
+                        </p>
+                        <label
+                        class="block text-xs font-bold text-gray-700 mb-1"
+                         data-i18n="whichSession"
+>
+                              কোন সেশনে যেতে চান:
+                        </label>
+                        <input type="number" id="inputSearchSession" placeholder="যেমন: 2025, 2026" class="w-full border p-2 rounded-lg text-sm font-bold text-blue-900 mb-3">
+                    </div>
+                    <button
+                    onclick="switchSession()"
+                     class="btn-primary w-full text-sm"
+                      data-i18n="findAndGoSession"
+>
+                     খুঁজুন ও সেশনে যান
+                    </button>
+                </div>
+
+                <!-- Right Sub-Card (2/3 Width): Create New Session -->
+                <div class="md:col-span-2 bg-gradient-to-r from-blue-900 to-indigo-800 text-white p-6 rounded-xl shadow-md flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div class="space-y-2">
+                        <span class="bg-yellow-400 text-blue-950 font-black text-xs px-2.5 py-1 rounded-full uppercase">New Academic Year</span>
+                        <h3
+                         class="text-xl font-bold"
+                         data-i18n="addNewSessionTitle"
+>
+                         নতুন বছরের জন্য সেশন যুক্ত করুন
+                        </h3>
+                        <p
+                         class="text-xs text-blue-100 leading-relaxed"
+                         data-i18n="addNewSessionDescription"
+>
+                         পূর্ববর্তী বছরের সকল স্টুডেন্টদের বকেয়া ফি স্বয়ংক্রিয়ভাবে ট্রান্সফার করে এবং প্রমোশন সেটআপ করতে নতুন সেশন ওপেন করুন। আগের সমস্ত ডাটা ডাটাবেজে নিরাপদ থাকবে।
+                        </p>
+                    </div>
+                    <button
+                        onclick="createNewSessionPrompt()"
+                          class="bg-yellow-500 hover:bg-yellow-400 text-blue-950 font-black px-6 py-3 rounded-xl shadow-lg border-2 border-yellow-300 text-sm whitespace-nowrap transition transform hover:scale-105"
+                         data-i18n="addNewSessionButton"
+>
+                              ➕ নতুন সেশন যুক্ত করি
+                    </button>
+                </div>
+            </div>
+
+            <!-- Add/Edit Fee Information Card -->
+            <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-blue-900">
+                <div class="flex justify-between items-center mb-4">
+                    <h3
+                          class="text-xl font-bold text-blue-900"
+                         data-i18n="classFeeTitle"
+>
+                         ⚙️ ক্লাস ফি ইনফরমেশন যোগ / এডিট করুন (অ্যাড ইনফরমেশন)
+                        </h3>
+                    <span
+                     class="text-xs bg-blue-100 text-blue-900 px-2.5 py-1 rounded-full font-bold"
+                     data-i18n="editSupportActive"
+>
+                      এডিট সাপোর্ট সক্রিয়
+                    </span>
+                </div>
+                <p
+                     class="text-sm text-gray-600 mb-4"
+                     data-i18n="classFeeDescription"
+>
+                     যেকোনো ক্লাসের ভর্তি/সেশন ফি, মাসিক বেতন এবং পরীক্ষা ফি এখানে নির্ধারণ করুন। এই তথ্যগুলো অটোমেটিক ডাটাবেজ টেবিলে যুক্ত হবে।
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end bg-gray-50 p-4 rounded-xl border">
+                    <div>
+                        <label
+                         class="block text-xs font-bold text-gray-700 mb-1"
+                         data-i18n="classLabel"
+>
+                           শ্রেণি:
+                        </label>
+                        <select id="cfgClassSelect" onchange="loadClassFeeConfig()" class="w-full border p-2 rounded-lg text-sm bg-white font-bold">
+                            <option value="প্লে">প্লে</option>
+                            <option value="নার্সারি">নার্সারি</option>
+                            <option value="ওয়ান">ওয়ান</option>
+                            <option value="টু">টু</option>
+                            <option value="থ্রি">থ্রি</option>
+                            <option value="ফোর">ফোর</option>
+                            <option value="ফাইভ">ফাইভ</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label
+                        class="block text-xs font-bold text-gray-700 mb-1"
+                         data-i18n="admissionSessionFeeLabel"
+>
+                          ভর্তি / সেশন ফি (টাকা):
+                        </label>
+                        <input type="number" id="cfgAdmissionFee" placeholder="যেমন: ১০০০" class="w-full border p-2 rounded-lg text-sm">
+                    </div>
+                    <div>
+                       <label
+                         class="block text-xs font-bold text-gray-700 mb-1"
+                          data-i18n="monthlyFeeLabel"
+>
+                           মাসিক বেতন (টাকা):
+                        </label>
+                        <input type="number" id="cfgMonthlyFee" placeholder="যেমন: ৫০০" class="w-full border p-2 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label
+                        class="block text-xs font-bold text-gray-700 mb-1"
+                         data-i18n="examFeeLabel"
+>
+                        পরীক্ষা ফি (প্রতি পরীক্ষা):
+                        </label>
+                        <input type="number" id="cfgExamFee" placeholder="যেমন: ২৫০" class="w-full border p-2 rounded-lg text-sm">
+                    </div>
+                </div>
+                <div class="mt-4 flex justify-end">
+                    <button
+                    onclick="saveClassFeeConfig()"
+                     class="btn-success px-8 text-sm"
+                     data-i18n="saveFeeButton"
+>
+                      ওকে (সংরক্ষণ করুন)
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- B. INFO -->
+        <section id="sec-info" class="hidden bg-white p-8 rounded-xl shadow-md no-print space-y-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b pb-3">
+        <h2 class="text-2xl font-bold text-blue-900">
+            শিক্ষকবৃন্দের তথ্য (Information)
+        </h2>
+
+        <button
+            type="button"
+            onclick="openRemoveTeacherModal()"
+            class="bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-red-700 transition"
+        >
+            Remove Teacher
+        </button>
+    </div>
+
+    <div id="teachersInformationContainer" class="space-y-4">
+        <!-- JS will render full-width cards here -->
+    </div>
+</section>
+
+<!-- REMOVE TEACHER MODAL -->
+<div
+    id="removeTeacherModal"
+    class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+>
+    <div class="bg-white rounded-xl p-6 max-w-md w-full space-y-4 shadow-xl">
+
+        <div class="border-b pb-2">
+            <h3 class="font-bold text-lg text-red-600">
+                Teacher Remove করুন
+            </h3>
+
+            <p class="text-xs text-gray-500 mt-1">
+                Teacher ID এবং সঠিক Password প্রদান করলে শিক্ষকটির সম্পূর্ণ
+                registration data মুছে যাবে।
+            </p>
+        </div>
+
+        <div>
+            <label
+                for="removeTeacherId"
+                class="block text-sm font-bold text-gray-700 mb-1"
+            >
+                Teacher ID
+            </label>
+
+            <input
+                type="text"
+                id="removeTeacherId"
+                placeholder="Teacher ID লিখুন"
+                autocomplete="off"
+                class="w-full border p-2 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+        </div>
+
+        <div>
+            <label
+                for="removeTeacherPassword"
+                class="block text-sm font-bold text-gray-700 mb-1"
+            >
+                Teacher Password
+            </label>
+
+            <div class="relative">
+                <input
+                    type="password"
+                    id="removeTeacherPassword"
+                    placeholder="Teacher Password লিখুন"
+                    autocomplete="off"
+                    class="w-full border p-2 pr-10 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+
+                <button
+                    type="button"
+                    onclick="togglePasswordVisibility('removeTeacherPassword', this)"
+                    class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-600"
+                    aria-label="Show or hide password"
+                >
+                    <i class="fa-solid fa-eye"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="flex justify-end space-x-2 pt-2">
+
+            <button
+                type="button"
+                onclick="closeRemoveTeacherModal()"
+                class="bg-gray-400 text-white px-4 py-2 rounded text-sm hover:bg-gray-500"
+            >
+                বাতিল
+            </button>
+
+            <button
+                type="button"
+                onclick="removeTeacherAccount()"
+                class="bg-red-600 text-white px-4 py-2 rounded font-bold text-sm hover:bg-red-700"
+            >
+                Remove Teacher
+            </button>
+
+        </div>
+    </div>
+</div>
+
+        <!-- C. DASHBOARD -->
+        <section id="sec-dashboard" class="hidden space-y-8 no-print">
+            <div>
+               <h2
+                 class="text-xl font-bold text-gray-800 mb-4 border-l-4 border-blue-900 pl-3"
+                 data-i18n="selectClassTitle"
+>
+                 শ্রেণি নির্বাচন করুন
+              </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    <script>
+                        const classes = ['প্লে', 'নার্সারি', 'ওয়ান', 'টু', 'থ্রি', 'ফোর', 'ফাইভ'];
+                        classes.forEach((c, idx) => {
+                            document.write(`
+                                <div onclick="openClassTable('${c}')" class="bg-white p-5 rounded-xl shadow hover:shadow-lg border border-gray-200 cursor-pointer transition transform hover:-translate-y-1 text-center">
+                                    <div class="w-12 h-12 bg-blue-100 text-blue-900 rounded-full flex items-center justify-center font-bold mx-auto mb-2 text-lg">${idx+1}</div>
+                                    <h3
+                                      class="font-bold text-lg text-gray-800"
+                                        data-class-card="${c}"
+>
+                                         শ্রেণি: ${c}
+                                        </h3>
+                                    <p
+                                     class="text-xs text-gray-500"
+                                     data-i18n="viewStudentTable"
+>
+                                    শিক্ষার্থী হিসাব টেবিল দেখতে ক্লিক করুন
+                                   </p>
+                                </div>
+                            `);
+                        });
+                    </script>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Receipt Card -->
+                <div class="bg-white p-6 rounded-xl shadow border border-gray-200">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="text-lg font-bold text-blue-900 flex items-center">
+                        <span class="mr-2">📄</span>
+                            <span data-i18n="createReceiptTitle">রশীদ তৈরি করুন (রশীদ)</span>
+                        </h3>
+                        <button
+                        onclick="openSearchReceiptModal()"
+                         class="bg-indigo-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold hover:bg-indigo-800 shadow"
+                        data-i18n="searchOldReceipt"
+>
+                        🔍 পুরাতন রশীদ খুঁজুন
+                        </button>
+                    </div>
+                    <p
+                        class="text-xs text-gray-600 mb-4"
+                         data-i18n="receiptDescription"
+>
+                        টাকা জমা নিয়ে শিক্ষার্থী ও অফিস কপি জেনারেট করুন।
+                    </p>
+                    <label
+                     class="block text-xs font-bold text-gray-700 mb-1"
+                    data-i18n="selectReceiptClass"
+>
+                     শ্রেণি সিলেক্ট করুন:
+                    </label>
+                    <select id="receiptClassSelect" class="w-full border p-2 rounded-lg text-sm mb-3">
+                        <option value="প্লে">প্লে</option>
+                        <option value="নার্সারি">নার্সারি</option>
+                        <option value="ওয়ান">ওয়ান</option>
+                        <option value="টু">টু</option>
+                        <option value="থ্রি">থ্রি</option>
+                        <option value="ফোর">ফোর</option>
+                        <option value="ফাইভ">ফাইভ</option>
+                    </select>
+                    <button
+                             onclick="openReceiptForm()"
+                              class="btn-success w-full"
+                             data-i18n="goToReceiptForm"
+>
+                             রশীদ ফর্মে যান
+                    </button>
+                </div>
+
+                <!-- Monthly Bill Card -->
+                <div class="bg-white p-6 rounded-xl shadow border border-gray-200">
+                    <h3 class="text-lg font-bold text-blue-900 mb-2 flex items-center">
+                         <span class="mr-2">🔔</span>
+                         <span data-i18n="monthlyBillTitle">প্রতি মাসের হিসাব দিন (বকেয়া বিল)</span>
+                        </h3>
+                    <p
+                     class="text-xs text-gray-600 mb-4"
+                     data-i18n="monthlyBillDescription"
+>
+                     মাসের শেষে বকেয়া তালিকা তৈরি করে প্রিন্ট বা হোয়াটসঅ্যাপে শেয়ার করুন।
+                    </p>
+                    <button
+                     onclick="triggerEndOfMonthAlert()"
+                     class="w-full bg-yellow-500 text-blue-950 py-2 rounded-lg font-bold hover:bg-yellow-400"
+                      data-i18n="giveMonthlyAccount"
+>
+                     প্রত্যেকের মাসের হিসাব দিন
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- D. CLASS DATABASE TABLE -->
+        <section id="sec-classtable" class="hidden space-y-4 no-print">
+            <div class="flex flex-wrap justify-between items-center bg-white p-4 rounded-xl shadow gap-2">
+                <h2 id="currentClassTitle" class="text-xl font-bold text-blue-900">শ্রেণি টেবিল</h2>
+                <div class="flex items-center space-x-3">
+                    <button onclick="openAddInfoModal()" class="btn-primary text-sm">Add New Student</button>
+                    <button onclick="openRemoveInfoModal()" class="bg-red-600 text-white px-4 py-2 rounded-md font-bold text-sm hover:bg-red-700">Remove a Student</button>
+                    <button onclick="showSection('dashboard')" class="bg-gray-500 text-white px-3 py-2 rounded-md text-sm">পিছনে যান</button>
+                </div>
+            </div>
+
+            <!-- Promotion Setup Panel -->
+            <div id="promotionBox" class="hidden bg-amber-50 border-2 border-yellow-500 p-4 rounded-xl shadow space-y-3">
+                <div class="flex justify-between items-center border-b border-yellow-200 pb-2">
+                    <h3 class="text-sm font-bold text-amber-900">🎓 পূর্ববর্তী শ্রেণির পাসকৃত শিক্ষার্থীদের নতুন সেশনে প্রমোশন ও মেধা স্থান নির্ধারণ</h3>
+                    <span id="prevClassLabel" class="text-xs font-bold bg-yellow-200 px-2.5 py-1 rounded-full text-amber-900"></span>
+                </div>
+                <p class="text-xs text-gray-700">পূর্ববর্তী শ্রেণি থেকে পাস করা শিক্ষার্থীদের নির্বাচন করে তাদের অর্জিত মেধা স্থান (নতুন রোল) প্রদান করুন। "প্রমোশন সম্পন্ন করুন" বাটনে চাপ দিলে তাদের সকল বিগত বকেয়া ফি অটোমেটিক যোগ হয়ে যাবে।</p>
+                <div id="promotionStudentsContainer" class="max-h-60 overflow-y-auto space-y-2 bg-white p-3 rounded-lg border"></div>
+                <div class="flex justify-end">
+                    <button onclick="submitPromotion()" class="btn-success text-xs">ওকে (প্রমোশন সম্পন্ন করুন)</button>
+                </div>
+            </div>
+
+            <div id="classFeeBanner" class="bg-blue-50 border-l-4 border-blue-900 p-4 rounded-r-xl shadow-sm flex flex-wrap justify-between items-center text-xs md:text-sm text-blue-900 font-bold">
+            </div>
+
+            <div class="overflow-x-auto bg-white rounded-xl shadow">
+                <table class="w-full text-xs text-left border-collapse">
+                    <thead class="bg-blue-900 text-white">
+                        <tr>
+                            <th class="p-2 border">রোল</th>
+                            <th class="p-2 border">নাম</th>
+                            <th class="p-2 border">Student ID</th>
+                            <th class="p-1 border text-center">ভর্তি/সেশন</th>
+                            <th class="p-1 border text-center">জানু</th>
+                            <th class="p-1 border text-center">ফেব্রু</th>
+                            <th class="p-1 border text-center">মার্চ</th>
+                            <th class="p-1 border text-center">এপ্রিল</th>
+                            <th class="p-1 border text-center">মে</th>
+                            <th class="p-1 border text-center">জুন</th>
+                            <th class="p-1 border text-center">জুলাই</th>
+                            <th class="p-1 border text-center">আগস্ট</th>
+                            <th class="p-1 border text-center">সেপ্টে</th>
+                            <th class="p-1 border text-center">অক্টো</th>
+                            <th class="p-1 border text-center">নভে</th>
+                            <th class="p-1 border text-center">ডিসে</th>
+                            <th class="p-2 border text-center">১ম মূল্যায়ন</th>
+                            <th class="p-2 border text-center">২য় মূল্যায়ন</th>
+                            <th class="p-2 border text-center">বার্ষিক</th>
+                            <th class="p-2 border text-center bg-red-800">চলতি বকেয়া</th>
+                            <th class="p-2 border text-center bg-orange-800">বিগত বকেয়া</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- E. RECEIPT FORM -->
+        <section id="sec-receiptform" class="hidden max-w-2xl mx-auto bg-white p-6 rounded-xl shadow no-print">
+            <h2 class="text-xl font-bold text-blue-900 mb-4 border-b pb-2">অর্থ জমার রশীদ পূরণ</h2>
+            <form id="receiptInputForm" onsubmit="generateReceiptPreview(event)" class="space-y-4">
+                <div class="grid grid-cols-4 gap-3">
+                    <div>
+                        <label class="text-xs font-bold">শিক্ষার্থীর নাম:</label>
+                        <input type="text" id="rStudentName" required placeholder="নাম লিখুন" class="w-full border p-2 rounded text-sm">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold">Student ID:</label>
+                        <input type="text" id="rStudentId" placeholder="Student ID লিখুন" class="w-full border p-2 rounded text-sm">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold">রোল নম্বর:</label>
+                        <input type="number" id="rStudentRoll" required placeholder="রোল" class="w-full border p-2 rounded text-sm">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold">শ্রেণি:</label>
+                        <input type="text" id="rClass" readonly class="w-full border p-2 rounded text-sm bg-gray-100">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs font-bold">ক্রমিক নং (রশীদ নং):</label>
+                        <input type="text" id="rSerial" readonly class="w-full border p-2 rounded text-sm bg-gray-100 font-bold text-blue-900">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold">তারিখ:</label>
+                        <input type="date" id="rDate" required class="w-full border p-2 rounded text-sm">
+                    </div>
+                </div>
+
+                <div id="receiptItemsContainer" class="space-y-2">
+                    <label class="text-xs font-bold block">পেমেন্ট আইটেমসমূহ:</label>
+                    <div class="flex space-x-2 items-center receipt-item-row">
+                        <div class="w-1/2 flex space-x-1">
+                            <select class="rItemType border p-2 rounded text-sm w-full" onchange="toggleSubSelects(this)">
+                                <option value="ভর্তি/সেশন">১। ভর্তি / সেশন</option>
+                                <option value="মাসিক বেতন">২। মাসিক বেতন</option>
+                                <option value="পরীক্ষা ফি">৩। পরীক্ষা ফি</option>
+                                <option value="বকেয়া">৪। বকেয়া</option>
+                                <option value="জরিমানা">৫। জরিমানা</option>
+                                <option value="আইডি কার্ড">৬। আইডি কার্ড/লেস</option>
+                                <option value="প্রসেস ফি">৭। প্রসেস ফি</option>
+                                <option value="খেলাধুলা">৮। খেলাধুলা/মিলাদ</option>
+                                <option value="বিবিধ">৯। বিবিধ</option>
+                            </select>
+
+                            <select class="rMonthTarget border p-2 rounded text-sm hidden w-full">
+                                <option value="auto">স্বয়ংক্রিয় (তারিখ অনুযায়ী)</option>
+                                <option value="jan">জানুয়ারি</option>
+                                <option value="feb">ফেব্রুয়ারি</option>
+                                <option value="mar">মার্চ</option>
+                                <option value="apr">এপ্রিল</option>
+                                <option value="may">মে</option>
+                                <option value="jun">জুন</option>
+                                <option value="jul">জুলাই</option>
+                                <option value="aug">আগস্ট</option>
+                                <option value="sep">সেপ্টেম্বর</option>
+                                <option value="oct">অক্টোবর</option>
+                                <option value="nov">নভেম্বর</option>
+                                <option value="dec">ডিসেম্বর</option>
+                            </select>
+
+                            <select class="rExamTarget border p-2 rounded text-sm hidden w-full">
+                                <option value="exam1">১ম মূল্যায়ন</option>
+                                <option value="exam2">২য় মূল্যায়ন</option>
+                                <option value="finalExam">বার্ষিক পরীক্ষা</option>
+                            </select>
+                        </div>
+
+                        <div class="w-1/2">
+                            <input type="number" placeholder="টাকা" required class="rItemAmount border p-2 rounded text-sm w-full">
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" onclick="addReceiptRow()" class="text-xs bg-gray-200 px-3 py-1 rounded font-bold text-gray-700">+ আরও ফি যোগ করুন</button>
+                <button type="submit" class="w-full btn-primary py-2.5">রশীদ জেনারেট করুন</button>
+            </form>
+        </section>
+
+        <!-- F. RECEIPT PREVIEW -->
+        <section id="sec-receiptpreview" class="hidden">
+            <div class="flex justify-center space-x-3 mb-4 no-print">
+                <button id="btnReceiptPaid" onclick="markReceiptPaid()" class="btn-success shadow">পেইড (Paid)</button>
+                <button id="btnReceiptUpdate" onclick="updateEditedReceipt()" class="hidden bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded-lg font-bold shadow">আপডেট (Update)</button>
+                <button onclick="editReceiptForm()" class="bg-yellow-500 text-blue-900 px-6 py-2 rounded-lg font-bold shadow">এডিট (Edit)</button>
+                <button onclick="showSection('dashboard')" class="bg-red-600 text-white px-6 py-2 rounded-lg font-bold shadow">আনপেইড (Unpaid)</button>
+                <button onclick="downloadReceiptPDF()" class="bg-purple-700 text-white px-6 py-2 rounded-lg font-bold shadow hover:bg-purple-800">PDF ডাউনলোড</button>
+            </div>
+
+            <div id="printableReceipt" class="bg-white p-4 max-w-4xl mx-auto border border-gray-400 space-y-6 text-black">
+
+                <script>
+                    ['অফিস কপি', 'ছাত্র/ছাত্রীর কপি'].forEach((copyType, copyIdx) => {
+                        const uniqueId = copyIdx === 0 ? 'office' : 'student';
+
+                        document.write(`
+                            <div class="border-2 border-red-800 p-4 relative bg-amber-50/25">
+
+                                <div class="flex justify-between items-start border-b-2 border-red-800 pb-2">
+                                    <div class="text-xs font-bold text-red-800">শিক্ষাই আলো</div>
+
+                                    <div class="text-center">
+                                        <h2 class="text-2xl font-bold text-red-800">লার্নিং স্কুল</h2>
+                                        <p class="text-xs font-bold">ছত্তিশ,ফেঞ্চুগঞ্জ, সিলেট।</p>
+                                        <p class="text-xs">মোবাইল: ০১৯১৫-২৭২৯১৫ (দক্ষিণ)</p>
+                                        <span class="inline-block border border-red-800 px-2 py-0.5 text-xs font-bold mt-1">টাকা আদায়ের রশীদ</span>
+                                    </div>
+
+                                    <div class="text-right text-xs">
+                                        <p class="font-bold text-red-800">${copyType}</p>
+                                        <p>ক্রমিক নং: <span class="outSerial font-bold text-red-700"></span></p>
+                                        <p>তারিখ: <span class="outDate font-bold"></span></p>
+                                    </div>
+                                </div>
+
+                                <div class="my-3 text-xs flex justify-between">
+                                    <p>নাম: <span class="outName border-b border-dotted border-black font-bold px-2"></span></p>
+                                    <p>Student ID: <span class="outStudentId border-b border-dotted border-black font-bold px-2"></span></p>
+                                    <p>শ্রেণি: <span class="outClass border-b border-dotted border-black font-bold px-2"></span></p>
+                                    <p>রোল: <span class="outRoll border-b border-dotted border-black font-bold px-2"></span></p>
+                                </div>
+
+                                <table class="w-full text-xs border-collapse border border-red-800 my-2">
+                                    <thead>
+                                        <tr class="bg-red-100 text-red-900">
+                                            <th class="border border-red-800 p-1 w-2/3">বিবরণ</th>
+                                            <th class="border border-red-800 p-1">টাকা</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody class="outItemsBody"></tbody>
+
+                                    <tfoot>
+                                        <tr class="font-bold">
+                                            <td class="border border-red-800 p-1 text-right">মোট:</td>
+                                            <td class="border border-red-800 p-1 outTotalAmount">০/-</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+
+                                <!-- SIGNATURE AREA -->
+                                <div class="mt-6 w-full grid grid-cols-2 gap-0 items-end text-xs pt-4">
+
+                                    <!-- COLLECTOR SIGNATURE -->
+                                    <div class="w-full text-center pr-2">
+
+                                        <div class="mb-1 h-8 flex items-center justify-center">
+                                            <img
+                                                id="collectorSigImg_${uniqueId}"
+                                                class="max-h-[20px] max-w-[50px] object-contain hidden"
+                                                alt="Signature"
+                                            >
+                                        </div>
+
+                                        <!-- Selection Controls -->
+                                        <div
+                                            id="collectorControls_${uniqueId}"
+                                            class="no-print mb-2 w-full flex flex-col items-center"
+                                        >
+                                            <select
+                                                id="collectorSelect_${uniqueId}"
+                                                onchange="signatureSelectionChanged('${uniqueId}', 'collector')"
+                                                class="border p-1 rounded text-[10px] bg-white font-bold w-full max-w-full box-border"
+                                            >
+                                                <option value="">আদায়কারী সিলেক্ট করুন</option>
+                                            </select>
+
+                                            <button
+                                                id="collectorApply_${uniqueId}"
+                                                onclick="applySignature('${uniqueId}', 'collector')"
+                                                class="hidden bg-blue-900 text-white px-3 py-1 rounded text-[10px] font-bold mt-1"
+                                            >
+                                                ওকে
+                                            </button>
+                                        </div>
+
+                                        <div class="border-t border-black w-full pt-1 font-bold">
+                                            আদায়কারীর স্বাক্ষর
+                                        </div>
+                                    </div>
+
+                                    <!-- HEAD TEACHER SIGNATURE -->
+                                    <div class="w-full text-center pl-2">
+
+                                        <div class="mb-1 h-8 flex items-center justify-center">
+                                            <img
+                                                id="headSigImg_${uniqueId}"
+                                                class="max-h-[20px] max-w-[50px] object-contain hidden"
+                                                alt="Signature"
+                                            >
+                                        </div>
+
+                                        <!-- Selection Controls -->
+                                        <div
+                                            id="headControls_${uniqueId}"
+                                            class="no-print mb-2 w-full flex flex-col items-center"
+                                        >
+                                            <select
+                                                id="headSelect_${uniqueId}"
+                                                onchange="signatureSelectionChanged('${uniqueId}', 'head')"
+                                                class="border p-1 rounded text-[10px] bg-white font-bold w-full max-w-full box-border"
+                                            >
+                                                <option value="">প্রধান শিক্ষক সিলেক্ট করুন</option>
+                                            </select>
+
+                                            <button
+                                                id="headApply_${uniqueId}"
+                                                onclick="applySignature('${uniqueId}', 'head')"
+                                                class="hidden bg-blue-900 text-white px-3 py-1 rounded text-[10px] font-bold mt-1"
+                                            >
+                                                ওকে
+                                            </button>
+                                        </div>
+
+                                        <div class="border-t border-black w-full pt-1 font-bold">
+                                            প্রধান শিক্ষক
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <!-- END SIGNATURE AREA -->
+
+                            </div>
+                        `);
+                    });
+                </script>
+
+            </div>
+        </section>
+
+        <!-- G. MONTHLY BILL GENERATOR -->
+        <section id="sec-monthlybill" class="hidden no-print">
+            <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow mb-4">
+                <h2 class="text-xl font-bold text-blue-900">মাসের বকেয়া হিসাব কার্ড তৈরি</h2>
+                <button onclick="showSection('dashboard')" class="bg-gray-500 text-white px-3 py-1 rounded text-sm">পিছনে যান</button>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl shadow mb-6">
+                <label class="text-sm font-bold mr-2">শ্রেণি নির্বাচন করুন:</label>
+                <select id="billClassSelect" onchange="loadBillStudents()" class="border p-2 rounded text-sm">
+                    <option value="প্লে">প্লে</option>
+                    <option value="নার্সারি">নার্সারি</option>
+                    <option value="ওয়ান">ওয়ান</option>
+                    <option value="টু">টু</option>
+                    <option value="থ্রি">থ্রি</option>
+                    <option value="ফোর">ফোর</option>
+                    <option value="ফাইভ">ফাইভ</option>
+                </select>
+            </div>
+
+            <div id="billStudentsList" class="space-y-3"></div>
+        </section>
+
+        <!-- H. BILL PREVIEW -->
+        <section id="sec-billpreview" class="hidden">
+            <div class="flex justify-center space-x-3 mb-4 no-print">
+                <button onclick="window.print()" class="btn-primary">প্রিন্ট (Print)</button>
+                <button onclick="downloadBillPDF()" class="btn-success">PDF ডাউনলোড</button>
+                <button onclick="shareWhatsApp()" class="bg-emerald-500 text-white px-5 py-2 rounded font-bold">WhatsApp শেয়ার</button>
+            </div>
+
+            <div id="billPaper" class="bg-white p-6 max-w-2xl mx-auto border-2 border-black text-xs space-y-4">
+                <div class="text-center border-b pb-2">
+                    <h2 class="text-xl font-bold">লার্নিং স্কুল</h2>
+                    <p> ছত্তিশ,ফেঞ্চুগঞ্জ, সিলেট।</p>
+                    <p class="font-semibold text-gray-700">মাসিক বকেয়া বেতন ও ফি পরিশোধের তাগিদপত্র</p>
+                </div>
+
+                <div class="flex justify-between font-bold">
+                    <p>ছাত্র/ছাত্রীর নাম: <span id="bStudentName" class="underline"></span></p>
+                    <p>শ্রেণি: <span id="bClass"></span></p>
+                    <p>তারিখ: <span id="bDate"></span></p>
+                </div>
+
+                <table class="w-full border-collapse border border-black text-center">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="border border-black p-1">ক্রমিক নং</th>
+                            <th class="border border-black p-1">বিবরণ</th>
+                            <th class="border border-black p-1">টাকা</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bTableBody"></tbody>
+                    <tfoot>
+                        <tr class="font-bold">
+                            <td colspan="2" class="border border-black p-1 text-right">মোট বকেয়া:</td>
+                            <td id="bTotalDue" class="border border-black p-1">০/-</td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <div class="text-[10px] space-y-1 text-gray-700 pt-2 border-t border-gray-300">
+                    <p>০১। প্রতি মাসের ০১-০৫ তারিখের মধ্যে বেতন পরিশোধ করতে হবে।</p>
+                    <p>০২। বেতন পরিশোধের সময় অবশ্যই লেসন কার্ড সাথে আনতে হবে।</p>
+                    <p>০৩। কোন ছাত্র/ছাত্রী একাধারে ২ মাস বা তার উপরে মাসিক বেতন পরিশোধ না করলে সাধারণ ৩০০ টাকা জরিমানা সহ বকেয়া পরিশোধ করতে হবে।</p>
+                </div>
+
+                <!-- MONTHLY BILL HEAD TEACHER SIGNATURE -->
+                <div class="flex justify-end pt-6">
+                    <div class="text-center w-[180px]">
+
+                        <!-- Signature Image -->
+                        <div class="h-8 flex items-center justify-center mb-1">
+                            <img
+                                id="billHeadSigImg"
+                                class="max-h-[20px] max-w-[50px] object-contain hidden"
+                                alt="Head Teacher Signature"
+                            >
+                        </div>
+
+                        <!-- Selection Controls -->
+                        <div
+                            id="billHeadControls"
+                            class="no-print mb-2 w-full flex flex-col items-center"
+                        >
+                            <select
+                                id="billHeadSelect"
+                                onchange="billHeadSignatureSelectionChanged()"
+                                class="border border-black p-1 rounded text-[10px] bg-white font-bold w-full box-border"
+                            >
+                                <option value="">প্রধান শিক্ষক সিলেক্ট করুন</option>
+                            </select>
+
+                            <button
+                                id="billHeadApply"
+                                onclick="applyBillHeadTeacherSignature()"
+                                class="hidden bg-blue-900 text-white px-3 py-1 rounded text-[10px] font-bold mt-1"
+                            >
+                                ওকে
+                            </button>
+                        </div>
+
+                        <div class="border-t border-black pt-1 font-bold">
+                            প্রধান শিক্ষক
+                        </div>
+
+                    </div>
+                </div>
+                <!-- END MONTHLY BILL HEAD TEACHER SIGNATURE -->
+
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Modal for Adding Student Information -->
+    <div id="addModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl p-6 max-w-md w-full space-y-4">
+            <h3 class="font-bold text-lg text-blue-900 border-b pb-2">নতুন শিক্ষার্থী যোগ করুন (Add Student)</h3>
+            <input type="text" id="mStudentName" placeholder="শিক্ষার্থীর নাম" class="w-full border p-2 rounded text-sm">
+            <input type="text" id="mStudentId" placeholder="Student ID (ঐচ্ছিক)" class="w-full border p-2 rounded text-sm">
+            <input type="number" id="mStudentRoll" placeholder="রোল নম্বর" class="w-full border p-2 rounded text-sm">
+            <input type="number" id="mPreviousDue" placeholder="বিগত বছরের বকেয়া (যদি থাকে)" class="w-full border p-2 rounded text-sm">
+
+            <div class="flex justify-end space-x-2">
+                <button onclick="closeAddInfoModal()" class="bg-gray-400 text-white px-4 py-1.5 rounded text-sm">বাতিল</button>
+                <button onclick="saveStudentInfo()" class="btn-primary text-sm">সংরক্ষণ করুন</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Removing Student Information -->
+    <div id="removeModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-xl p-6 max-w-md w-full space-y-4">
+
+        <h3 class="font-bold text-lg text-red-600 border-b pb-2">
+            শিক্ষার্থী রিমুভ করুন (Remove Student)
+        </h3>
+
+        <p class="text-xs text-gray-500">
+            যে শিক্ষার্থীকে মুছে ফেলতে চান তার Student ID প্রদান করুন।
+            মুছে ফেলার পর পরবর্তী সকল শিক্ষার্থীর রোল ১ ধাপ করে অটোমেটিক এগিয়ে আসবে।
+        </p>
+
+        <input
+            type="text"
+            id="remStudentId"
+            placeholder="Student ID লিখুন"
+            autocomplete="off"
+            class="w-full border p-2 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+
+        <div class="flex justify-end space-x-2">
+            <button
+                type="button"
+                onclick="closeRemoveInfoModal()"
+                class="bg-gray-400 text-white px-4 py-1.5 rounded text-sm"
+            >
+                বাতিল
+            </button>
+
+            <button
+                type="button"
+                onclick="removeStudentInfo()"
+                class="bg-red-600 text-white px-4 py-2 rounded font-bold text-sm hover:bg-red-700"
+            >
+                রিমুভ করুন
+            </button>
+        </div>
+
+    </div>
+</div>
+
+    <!-- Modal for Search Old Receipts -->
+    <div id="searchReceiptModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl p-6 max-w-lg w-full space-y-4">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-lg text-blue-900">🔍 পুরাতন রশীদ খুঁজুন</h3>
+                <button onclick="closeSearchReceiptModal()" class="text-gray-500 hover:text-black font-bold">✕</button>
+            </div>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">শিক্ষার্থীর নাম:</label>
+                    <input type="text" id="sStudentName" placeholder="নাম লিখুন" class="w-full border p-2 rounded text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Student ID:</label>
+                    <input type="text" id="sStudentId" placeholder="Student ID লিখুন" class="w-full border p-2 rounded text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">রোল নম্বর:</label>
+                    <input type="number" id="sStudentRoll" placeholder="রোল নম্বর" class="w-full border p-2 rounded text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">শ্রেণি:</label>
+                    <select id="sClass" class="w-full border p-2 rounded text-sm font-bold">
+                        <option value="প্লে">প্লে</option>
+                        <option value="নার্সারি">নার্সারি</option>
+                        <option value="ওয়ান">ওয়ান</option>
+                        <option value="টু">টু</option>
+                        <option value="থ্রি">থ্রি</option>
+                        <option value="ফোর">ফোর</option>
+                        <option value="ফাইভ">ফাইভ</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">সেশন / বছর (Session):</label>
+                    <input type="number" id="sSession" placeholder="যেমন: 2026, 2025" class="w-full border p-2 rounded text-sm">
+                </div>
+
+                <button onclick="searchOldReceipts()" class="w-full btn-primary py-2 text-sm">খুঁজুন</button>
+            </div>
+
+            <!-- Search Results Area -->
+            <div id="searchResultsContainer" class="mt-4 max-h-60 overflow-y-auto space-y-2 border-t pt-2">
+                <!-- Dynamic Results JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- footer start -->
+
+    <footer>
+
+
+    <section class="section-last">
+
+        <div class="section-last__container">
+
+            <div class="section-last__content-2 card-footer">
+
+                <img src="image/hussain.jpg" alt="hussain">
+                <h2 style="font-family:Arial, Helvetica, sans-serif; font-size: 1.4rem; font-weight: bold;">Developed by: Md. Rabbik Hussain</h2>
+                <p style="font-family: 'Times New Roman', Times, serif; font-size: 20px;">Helpline:  <i class="fa-solid fa-phone"></i> +880 1819-682851</p>
+                <p style="font-size: 16px;">E-mail:  <i class="fa-regular fa-envelope"></i> rabbikhussain722245@gmail.com</p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</footer>
+
+<!-- footer end -->
+
+    <!-- JavaScript Engine -->
+    <script src="dashboard.js"></script>
+</body>
+</html>
