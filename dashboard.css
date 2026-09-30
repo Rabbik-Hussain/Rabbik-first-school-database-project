@@ -703,3 +703,47 @@ nav > div > div:last-child > button[onclick="showSection('info')"]:hover {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.28);
     transform: translateY(-1px);
 }
+
+
+/* ==========================================
+   Announcement Marquee - Above Navbar
+   ========================================== */
+
+nav::before {
+    content: "We are trying our best to fill this society with the light of education and make our children as good citizens. We hope to continue doing so in the future in sha Allah 🙋🏻‍♂️ 😎 🙋🏻‍♀️     আমরা এই সমাজকে শিক্ষার আলোয় আলোকিত করতে এবং আমাদের সন্তানদের সুনাগরিক হিসেবে গড়ে তুলতে সর্বাত্মক চেষ্টা করছি। ইনশাআল্লাহ, ভবিষ্যতেও আমরা এই ধারা অব্যাহত রাখার আশা রাখি। 🙋🏻‍♂️ 🙋🏻‍♀️";
+
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+
+    background: #0f172a;
+    color: #ffffff;
+
+    padding: 7px 0;
+    font-size: 14px;
+    font-weight: 600;
+
+    box-sizing: border-box;
+
+    animation: schoolAnnouncement 28s linear infinite;
+}
+
+@keyframes schoolAnnouncement {
+    from {
+        transform: translateX(100%);
+    }
+
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+/* Mobile */
+@media screen and (max-width: 399px) {
+    nav::before {
+        font-size: 12px;
+        padding: 6px 0;
+        animation-duration: 24s;
+    }
+}
