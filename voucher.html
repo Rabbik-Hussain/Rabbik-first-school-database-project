@@ -2478,6 +2478,31 @@
                 }
             );
 
+            amount.addEventListener(
+    'beforeinput',
+    function(event) {
+
+        if (
+            event.inputType ===
+            'insertLineBreak'
+        ) {
+
+            event.preventDefault();
+
+            if (
+                oldVoucherMode
+            ) {
+
+                return;
+            }
+
+            addExpenseRow();
+
+        }
+
+    }
+);
+
         }
 
 
@@ -4327,6 +4352,7 @@
     );
 
 </script>
+
 
 </body>
 </html>
