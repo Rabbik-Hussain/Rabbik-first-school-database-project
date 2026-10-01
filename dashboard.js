@@ -1900,6 +1900,7 @@ function processItemsToDatabase(student, itemsList, className, isReverse = false
 
 function markReceiptPaid() {
     const studentName = document.querySelector('#printableReceipt .outName').innerText.trim();
+
     const studentIdText = document.querySelector('#printableReceipt .outStudentId')
         ? document.querySelector('#printableReceipt .outStudentId').innerText.trim()
         : '';
@@ -1916,7 +1917,6 @@ function markReceiptPaid() {
 
     const paidAmount = parseFloat(totalAmountStr) || 0;
 
-    // Student ID না থাকলে পুরোনো Name/Roll system ব্যবহার হবে
     const studentId =
         studentIdText && studentIdText !== '—'
             ? studentIdText
@@ -1927,69 +1927,90 @@ function markReceiptPaid() {
         let student = null;
 
         // =====================================================
-        // Student ID থাকলে প্রথমে Student ID দিয়ে Student খোঁজা হবে
+        // Student ID দেওয়া থাকলে শুধুমাত্র Student ID দিয়েই
+        // exact student খোঁজা হবে
         // =====================================================
         if (studentId) {
-            student = sampleData[className].find(
-                s => String(s.studentId || '').trim() === studentId
-            );
-        }
 
-        // =====================================================
-        // Student ID না পাওয়া গেলে পুরোনো Name/Roll fallback
-        // =====================================================
-        if (!student) {
+            student = sampleData[className].find(
+                s =>
+                    String(s.studentId || '').trim() ===
+                    String(studentId).trim()
+            );
+
+            // Student ID দেওয়া আছে কিন্তু match হয়নি
+            // হলে Name/Roll দিয়ে অন্য student খোঁজা যাবে না
+            if (!student) {
+                alert(
+                    `Student ID "${studentId}" এই শ্রেণির ডাটাবেজে পাওয়া যায়নি।\n\nনাম বা রোল দিয়ে অন্য কোনো শিক্ষার্থী নির্বাচন করা হবে না।`
+                );
+                return;
+            }
+
+        } else {
+
+            // =================================================
+            // Student ID না থাকলে পুরোনো Name/Roll system
+            // ব্যবহার করা হবে
+            // =================================================
             student = sampleData[className].find(
                 s =>
                     s.name === studentName ||
                     String(s.roll) === String(roll)
             );
-        }
 
-        if (student) {
-
-            processItemsToDatabase(
-                student,
-                currentGeneratedItems,
-                className,
-                false
-            );
-
-            const itemsBodyHtml =
-                document.querySelector('.outItemsBody').innerHTML;
-
-            savedReceipts.push({
-                serial: serial,
-                name: studentName,
-                studentId: student.studentId || studentId || '',
-                roll: roll,
-                className: className,
-                session: currentSession,
-                date: date,
-                total: paidAmount,
-                itemsHtml: itemsBodyHtml,
-                itemsList: currentGeneratedItems
-            });
-
-            if (!receiptCounters[className]) {
-                receiptCounters[className] = 1;
+            if (!student) {
+                alert(
+                    "শিক্ষার্থীর নাম/রোল ডাটাবেসে পাওয়া যায়নি!"
+                );
+                return;
             }
-
-            receiptCounters[className] += 1;
-
-            saveAndSyncData();
-
-            alert(
-                `সফলভাবে ${paidAmount} টাকা জমা করা হয়েছে এবং ডাটাবেস আপডেট করা হয়েছে!`
-            );
-
-            openClassTable(className);
-            return;
         }
+
+        // =====================================================
+        // Exact student-এর payment database-এ যোগ হবে
+        // =====================================================
+        processItemsToDatabase(
+            student,
+            currentGeneratedItems,
+            className,
+            false
+        );
+
+        const itemsBodyHtml =
+            document.querySelector('.outItemsBody').innerHTML;
+
+        savedReceipts.push({
+            serial: serial,
+            name: studentName,
+            studentId: student.studentId || studentId || '',
+            roll: roll,
+            className: className,
+            session: currentSession,
+            date: date,
+            total: paidAmount,
+            itemsHtml: itemsBodyHtml,
+            itemsList: currentGeneratedItems
+        });
+
+        if (!receiptCounters[className]) {
+            receiptCounters[className] = 1;
+        }
+
+        receiptCounters[className] += 1;
+
+        saveAndSyncData();
+
+        alert(
+            `সফলভাবে ${paidAmount} টাকা জমা করা হয়েছে এবং ডাটাবেস আপডেট করা হয়েছে!`
+        );
+
+        openClassTable(className);
+        return;
     }
 
     alert(
-        "শিক্ষার্থীর Student ID/নাম/রোল ডাটাবেসে পাওয়া যায়নি! তবে জমা রেকর্ড হিসেবে রাখা হয়েছে।"
+        "নির্বাচিত শ্রেণির ডাটাবেসে কোনো শিক্ষার্থী পাওয়া যায়নি!"
     );
 
     showSection('dashboard');
@@ -2026,29 +2047,48 @@ function updateEditedReceipt() {
         let oldReceipt = savedReceipts[receiptIdx];
 
         // =====================================================
-        // পুরোনো Receipt-এর payment reverse করার জন্য
-        // আগে Student ID দিয়ে student খোঁজা হবে
-        // তারপর পুরোনো Receipt-এর Roll দিয়ে fallback হবে
+        // পুরোনো Receipt-এর payment reverse
+        // Student ID থাকলে শুধুমাত্র Student ID দিয়ে খোঁজা হবে
         // =====================================================
         if (sampleData[oldReceipt.className]) {
 
             let oldStudent = null;
 
             if (oldReceipt.studentId) {
+
                 oldStudent = sampleData[oldReceipt.className].find(
                     s =>
                         String(s.studentId || '').trim() ===
                         String(oldReceipt.studentId).trim()
                 );
-            }
 
-            if (!oldStudent) {
+                // পুরোনো Receipt-এ Student ID ছিল কিন্তু
+                // সেই ID-এর student পাওয়া যায়নি
+                if (!oldStudent) {
+                    alert(
+                        `পুরোনো Receipt-এর Student ID "${oldReceipt.studentId}" ডাটাবেজে পাওয়া যায়নি।\n\nPayment reverse করা হয়নি।`
+                    );
+                    return;
+                }
+
+            } else {
+
+                // পুরোনো Receipt-এ Student ID না থাকলে
+                // পুরোনো Roll system ব্যবহার হবে
                 oldStudent = sampleData[oldReceipt.className].find(
                     s => String(s.roll) === String(oldReceipt.roll)
                 );
+
+                if (!oldStudent) {
+                    alert(
+                        "পুরোনো Receipt-এর শিক্ষার্থী ডাটাবেজে পাওয়া যায়নি।"
+                    );
+                    return;
+                }
             }
 
             if (oldStudent && oldReceipt.itemsList) {
+
                 processItemsToDatabase(
                     oldStudent,
                     oldReceipt.itemsList,
@@ -2060,37 +2100,52 @@ function updateEditedReceipt() {
 
         // =====================================================
         // নতুন Receipt-এর student খোঁজা
-        // Student ID → Primary
-        // Roll/Name → Fallback
+        // Student ID থাকলে শুধুমাত্র Student ID
         // =====================================================
         if (sampleData[className]) {
 
             let newStudent = null;
 
             if (studentId && studentId !== '—') {
+
                 newStudent = sampleData[className].find(
                     s =>
                         String(s.studentId || '').trim() ===
-                        studentId
+                        String(studentId).trim()
                 );
-            }
 
-            if (!newStudent) {
+                // Student ID দেওয়া আছে কিন্তু পাওয়া যায়নি
+                // Name/Roll দিয়ে অন্য student নেওয়া যাবে না
+                if (!newStudent) {
+                    alert(
+                        `Student ID "${studentId}" এই শ্রেণির ডাটাবেজে পাওয়া যায়নি।\n\nনাম বা রোল দিয়ে অন্য কোনো শিক্ষার্থী নির্বাচন করা হবে না।`
+                    );
+                    return;
+                }
+
+            } else {
+
+                // Student ID না থাকলে পুরোনো Roll/Name system
                 newStudent = sampleData[className].find(
                     s =>
                         String(s.roll) === String(roll) ||
                         s.name === studentName
                 );
+
+                if (!newStudent) {
+                    alert(
+                        "শিক্ষার্থীর নাম/রোল ডাটাবেজে পাওয়া যায়নি!"
+                    );
+                    return;
+                }
             }
 
-            if (newStudent) {
-                processItemsToDatabase(
-                    newStudent,
-                    currentGeneratedItems,
-                    className,
-                    false
-                );
-            }
+            processItemsToDatabase(
+                newStudent,
+                currentGeneratedItems,
+                className,
+                false
+            );
         }
 
         // =====================================================
