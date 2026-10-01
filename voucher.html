@@ -2478,30 +2478,28 @@
                 }
             );
 
-            amount.addEventListener(
-    'beforeinput',
-    function(event) {
+            if (/Android/i.test(navigator.userAgent)) {
 
-        if (
-            event.inputType ===
-            'insertLineBreak'
-        ) {
+    amount.addEventListener(
+        'keyup',
+        function(event) {
+
+            if (event.key !== 'Enter') {
+                return;
+            }
 
             event.preventDefault();
 
-            if (
-                oldVoucherMode
-            ) {
-
+            if (oldVoucherMode) {
                 return;
             }
 
             addExpenseRow();
 
         }
+    );
 
-    }
-);
+}
 
         }
 
