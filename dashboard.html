@@ -245,6 +245,294 @@
                     </button>
                 </div>
             </div>
+
+            <!-- Today's Account Card -->
+            <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-emerald-600">
+                <div class="flex justify-between items-start gap-4">
+                    <div>
+                        <h3
+                            class="text-xl font-bold text-blue-900 mb-2"
+                            data-i18n="todayAccountTitle"
+                        >
+                            📊 আজকের হিসাব
+                        </h3>
+
+                        <p
+                            class="text-sm text-gray-600 leading-relaxed"
+                            data-i18n="todayAccountDescription"
+                        >
+                            প্রতিদিনের শ্রেণিভিত্তিক জমা, প্রতিষ্ঠানের খরচ এবং অবশিষ্ট হিসাব দেখুন।
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        onclick="openTodayAccount()"
+                        class="shrink-0 bg-indigo-700 hover:bg-indigo-800 text-white text-xs px-3 py-2 rounded-lg font-bold shadow transition"
+                        data-i18n="findAccountMonth"
+                    >
+                        🔍 হিসাবের মাসটি খুঁজুন
+                    </button>
+                </div>
+
+                <div class="mt-5">
+                    <button
+                        type="button"
+                        onclick="openTodayAccount()"
+                        class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-lg font-bold transition shadow-sm"
+                        data-i18n="viewTodayAccount"
+                    >
+                        📊 আজকের হিসাব দেখুন
+                    </button>
+                </div>
+            </div>
+
+
+                                <!-- Today's Account Internal Report View -->
+                    <div id="todayAccountView" class="hidden bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+
+                        <!-- Report Header -->
+                        <div class="bg-gradient-to-r from-emerald-700 to-blue-900 text-white p-5">
+                            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+                                <div>
+                                    <div class="text-xs font-semibold opacity-90 mb-1">
+                                        📊 <span data-i18n="todayAccountReportLabel">
+                                            আজকের হিসাব রিপোর্ট
+                                        </span>
+                                    </div>
+
+                                    <h2
+                                        class="text-2xl font-black"
+                                        data-i18n="todayAccountReportTitle"
+                                    >
+                                        দিনভিত্তিক হিসাব
+                                    </h2>
+
+                                    <p class="text-sm text-emerald-100 mt-1">
+                                        <span data-i18n="currentSessionLabel">
+                                            শিক্ষাবর্ষ / Session:
+                                        </span>
+                                        <span id="todayAccountSession" class="font-black">
+                                            ২০২৬
+                                        </span>
+                                    </p>
+                                </div>
+
+                                <!-- Print & PDF Buttons -->
+                                <div class="flex items-center gap-2 mr-2">
+
+                                    <!-- Print Button -->
+                                    <button
+                                        type="button"
+                                        onclick="printTodayAccount()"
+                                        class="bg-amber-400 hover:bg-amber-500 text-gray-900 px-4 py-2 rounded-lg font-bold text-sm shadow-md transition"
+                                    >
+                                        🖨️ প্রিন্ট
+                                    </button>
+
+                                    <!-- PDF Button -->
+                                    <button
+                                        type="button"
+                                        onclick="downloadTodayAccountPDF()"
+                                        class="bg-rose-500 hover:bg-rose-600 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-md transition"
+                                    >
+                                        📄 PDF
+                                    </button>
+
+                                </div>
+
+                                <button
+                                    type="button"
+                                    onclick="closeTodayAccount()"
+                                    class="bg-white text-blue-900 px-4 py-2 rounded-lg font-bold text-sm shadow hover:bg-gray-100 transition"
+                                    data-i18n="todayAccountBackButton"
+                                >
+                                    ← ফিরে যান
+                                </button>
+
+                            </div>
+                        </div>
+
+
+                        <!-- Report Search Area -->
+                        <div class="p-5 bg-gray-50 border-b">
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+
+                                <div>
+                                    <label
+                                        for="todayAccountSearchDate"
+                                        class="block text-xs font-bold text-gray-700 mb-1"
+                                        data-i18n="todayAccountDateLabel"
+                                    >
+                                        যে তারিখের হিসাব দেখতে চান
+                                    </label>
+
+                                    <input
+                                        type="date"
+                                        id="todayAccountSearchDate"
+                                        class="w-full border border-gray-300 p-2.5 rounded-lg text-sm font-bold text-blue-900 bg-white"
+                                    >
+                                </div>
+
+                                <div>
+                                    <label
+                                        class="block text-xs font-bold text-gray-700 mb-1"
+                                        data-i18n="todayAccountSessionLabel"
+                                    >
+                                        বর্তমান সেশন
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        id="todayAccountSearchSession"
+                                        class="w-full border border-gray-300 p-2.5 rounded-lg text-sm font-bold text-blue-900 bg-gray-100"
+                                        value="২০২৬"
+                                        readonly
+                                    >
+                                </div>
+
+                                <button
+                                    type="button"
+                                    onclick="searchTodayAccountDate()"
+                                    class="w-full bg-indigo-700 hover:bg-indigo-800 text-white py-2.5 rounded-lg font-bold text-sm shadow transition"
+                                    data-i18n="todayAccountSearchButton"
+                                >
+                                    🔍 হিসাব খুঁজুন
+                                </button>
+
+                            </div>
+
+                            <p
+                                class="text-xs text-gray-500 mt-3"
+                                data-i18n="todayAccountSearchNote"
+                            >
+                                বর্তমান সেশন অনুযায়ী তারিখের হিসাব খুঁজে দেখা যাবে।
+                            </p>
+
+                        </div>
+
+
+                        <!-- Month Title -->
+                        <div class="p-5 pb-3">
+
+                            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+
+                                <div>
+                                    <h3
+                                        id="todayAccountMonthTitle"
+                                        class="text-xl font-black text-blue-900"
+                                    >
+                                        জানুয়ারি ২০২৬
+                                    </h3>
+
+                                    <p
+                                        class="text-xs text-gray-500 mt-1"
+                                        data-i18n="todayAccountMonthDescription"
+                                    >
+                                        নির্বাচিত সেশনের দিনভিত্তিক জমা ও খরচের হিসাব
+                                    </p>
+                                </div>
+
+                                <div
+                                    id="todayAccountSearchStatus"
+                                    class="hidden text-xs font-bold px-3 py-1.5 rounded-full bg-yellow-100 text-yellow-800"
+                                ></div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Table -->
+                        <div class="px-5 pb-5">
+
+                            <div class="border border-gray-200 rounded-xl overflow-x-auto">
+
+                                <table class="min-w-[1250px] w-full text-sm border-collapse">
+
+                                    <thead>
+                                        <tr class="bg-blue-900 text-white">
+
+                                            <th
+                                                class="border border-blue-800 px-3 py-3 text-center sticky left-0 bg-blue-900 z-10"
+                                                data-i18n="todayAccountDate"
+                                            >
+                                                তারিখ
+                                            </th>
+
+                                            <th
+                                                class="border border-blue-800 px-3 py-3 text-center sticky left-[82px] bg-blue-900 z-10"
+                                                data-i18n="todayAccountDay"
+                                            >
+                                                বার
+                                            </th>
+
+                                            <th class="border border-blue-800 px-3 py-3 text-center">প্লে</th>
+                                            <th class="border border-blue-800 px-3 py-3 text-center">নার্সারি</th>
+                                            <th class="border border-blue-800 px-3 py-3 text-center">ওয়ান</th>
+                                            <th class="border border-blue-800 px-3 py-3 text-center">টু</th>
+                                            <th class="border border-blue-800 px-3 py-3 text-center">থ্রি</th>
+                                            <th class="border border-blue-800 px-3 py-3 text-center">ফোর</th>
+                                            <th class="border border-blue-800 px-3 py-3 text-center">ফাইভ</th>
+
+                                            <th
+                                                class="border border-blue-800 px-3 py-3 text-center bg-emerald-700"
+                                                data-i18n="todayAccountTotal"
+                                            >
+                                                মোট জমা
+                                            </th>
+
+                                            <th
+                                                class="border border-blue-800 px-3 py-3 text-center bg-red-700"
+                                                data-i18n="todayAccountVoucher"
+                                            >
+                                                ভাউচার
+                                            </th>
+
+                                            <th
+                                                class="border border-blue-800 px-3 py-3 text-center bg-indigo-700"
+                                                data-i18n="todayAccountNet"
+                                            >
+                                                নেট জমা
+                                            </th>
+
+                                        </tr>
+                                    </thead>
+
+                                    <tbody id="todayAccountTableBody">
+                                        <!-- JavaScript will generate daily rows here -->
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Report Footer -->
+                        <div class="px-5 pb-5">
+
+                            <div
+                                class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-xs text-blue-900"
+                            >
+                                <div class="font-bold mb-1">
+                                    📌 <span data-i18n="todayAccountFooterTitle">
+                                        হিসাবের নিয়ম
+                                    </span>
+                                </div>
+
+                                <p data-i18n="todayAccountFooterDescription">
+                                    রসিদে Paid হওয়া অর্থ শ্রেণিভিত্তিক জমা হিসেবে এবং সংরক্ষিত ভাউচার প্রতিষ্ঠানের খরচ হিসেবে গণনা হবে। একই দিনে একাধিক রসিদ ও ভাউচার থাকলে সেগুলো যোগ হয়ে মোট হিসাব তৈরি হবে।
+                                </p>
+                            </div>
+
+                        </div>
+
+                    </div>
+
         </section>
 
         <!-- B. INFO -->
@@ -354,108 +642,201 @@
 </div>
 
         <!-- C. DASHBOARD -->
-        <section id="sec-dashboard" class="hidden space-y-8 no-print">
-            <div>
-               <h2
-                 class="text-xl font-bold text-gray-800 mb-4 border-l-4 border-blue-900 pl-3"
-                 data-i18n="selectClassTitle"
->
-                 শ্রেণি নির্বাচন করুন
-              </h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                    <script>
-                        const classes = ['প্লে', 'নার্সারি', 'ওয়ান', 'টু', 'থ্রি', 'ফোর', 'ফাইভ'];
-                        classes.forEach((c, idx) => {
-                            document.write(`
-                                <div onclick="openClassTable('${c}')" class="bg-white p-5 rounded-xl shadow hover:shadow-lg border border-gray-200 cursor-pointer transition transform hover:-translate-y-1 text-center">
-                                    <div class="w-12 h-12 bg-blue-100 text-blue-900 rounded-full flex items-center justify-center font-bold mx-auto mb-2 text-lg">${idx+1}</div>
-                                    <h3
-                                      class="font-bold text-lg text-gray-800"
-                                        data-class-card="${c}"
->
-                                         শ্রেণি: ${c}
-                                        </h3>
-                                    <p
-                                     class="text-xs text-gray-500"
-                                     data-i18n="viewStudentTable"
->
-                                    শিক্ষার্থী হিসাব টেবিল দেখতে ক্লিক করুন
-                                   </p>
-                                </div>
-                            `);
-                        });
-                    </script>
-                </div>
-            </div>
+                        <section id="sec-dashboard" class="hidden space-y-8 no-print">
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Receipt Card -->
-                <div class="bg-white p-6 rounded-xl shadow border border-gray-200">
-                    <div class="flex justify-between items-center mb-2">
-                        <h3 class="text-lg font-bold text-blue-900 flex items-center">
-                        <span class="mr-2">📄</span>
-                            <span data-i18n="createReceiptTitle">রশীদ তৈরি করুন (রশীদ)</span>
-                        </h3>
-                        <button
-                        onclick="openSearchReceiptModal()"
-                         class="bg-indigo-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold hover:bg-indigo-800 shadow"
-                        data-i18n="searchOldReceipt"
->
-                        🔍 পুরাতন রশীদ খুঁজুন
-                        </button>
+                    <div>
+                        <h2
+                            class="text-xl font-bold text-gray-800 mb-4 border-l-4 border-blue-900 pl-3"
+                            data-i18n="selectClassTitle"
+                        >
+                            শ্রেণি নির্বাচন করুন
+                        </h2>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                            <script>
+                                const classes = ['প্লে', 'নার্সারি', 'ওয়ান', 'টু', 'থ্রি', 'ফোর', 'ফাইভ'];
+
+                                classes.forEach((c, idx) => {
+                                    document.write(`
+                                        <div
+                                            onclick="openClassTable('${c}')"
+                                            class="bg-white p-5 rounded-xl shadow hover:shadow-lg border border-gray-200 cursor-pointer transition transform hover:-translate-y-1 text-center"
+                                        >
+                                            <div
+                                                class="w-12 h-12 bg-blue-100 text-blue-900 rounded-full flex items-center justify-center font-bold mx-auto mb-2 text-lg"
+                                            >
+                                                ${idx + 1}
+                                            </div>
+
+                                            <h3
+                                                class="font-bold text-lg text-gray-800"
+                                                data-class-card="${c}"
+                                            >
+                                                শ্রেণি: ${c}
+                                            </h3>
+
+                                            <p
+                                                class="text-xs text-gray-500"
+                                                data-i18n="viewStudentTable"
+                                            >
+                                                শিক্ষার্থী হিসাব টেবিল দেখতে ক্লিক করুন
+                                            </p>
+                                        </div>
+                                    `);
+                                });
+                            </script>
+                        </div>
                     </div>
-                    <p
-                        class="text-xs text-gray-600 mb-4"
-                         data-i18n="receiptDescription"
->
-                        টাকা জমা নিয়ে শিক্ষার্থী ও অফিস কপি জেনারেট করুন।
-                    </p>
-                    <label
-                     class="block text-xs font-bold text-gray-700 mb-1"
-                    data-i18n="selectReceiptClass"
->
-                     শ্রেণি সিলেক্ট করুন:
-                    </label>
-                    <select id="receiptClassSelect" class="w-full border p-2 rounded-lg text-sm mb-3">
-                        <option value="প্লে">প্লে</option>
-                        <option value="নার্সারি">নার্সারি</option>
-                        <option value="ওয়ান">ওয়ান</option>
-                        <option value="টু">টু</option>
-                        <option value="থ্রি">থ্রি</option>
-                        <option value="ফোর">ফোর</option>
-                        <option value="ফাইভ">ফাইভ</option>
-                    </select>
-                    <button
-                             onclick="openReceiptForm()"
-                              class="btn-success w-full"
-                             data-i18n="goToReceiptForm"
->
-                             রশীদ ফর্মে যান
-                    </button>
-                </div>
 
-                <!-- Monthly Bill Card -->
-                <div class="bg-white p-6 rounded-xl shadow border border-gray-200">
-                    <h3 class="text-lg font-bold text-blue-900 mb-2 flex items-center">
-                         <span class="mr-2">🔔</span>
-                         <span data-i18n="monthlyBillTitle">প্রতি মাসের হিসাব দিন (বকেয়া বিল)</span>
-                        </h3>
-                    <p
-                     class="text-xs text-gray-600 mb-4"
-                     data-i18n="monthlyBillDescription"
->
-                     মাসের শেষে বকেয়া তালিকা তৈরি করে প্রিন্ট বা হোয়াটসঅ্যাপে শেয়ার করুন।
-                    </p>
-                    <button
-                     onclick="triggerEndOfMonthAlert()"
-                     class="w-full bg-yellow-500 text-blue-950 py-2 rounded-lg font-bold hover:bg-yellow-400"
-                      data-i18n="giveMonthlyAccount"
->
-                     প্রত্যেকের মাসের হিসাব দিন
-                    </button>
-                </div>
-            </div>
-        </section>
+
+                    <!-- Receipt + Voucher + Monthly Bill Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                        <!-- Receipt Card -->
+                        <div class="bg-white p-6 rounded-xl shadow border border-gray-200">
+
+                            <div class="flex justify-between items-center mb-2">
+
+                                <h3 class="text-lg font-bold text-blue-900 flex items-center">
+                                    <span class="mr-2">📄</span>
+
+                                    <span data-i18n="createReceiptTitle">
+                                        রশীদ তৈরি করুন (রশীদ)
+                                    </span>
+                                </h3>
+
+                                <button
+                                    onclick="openSearchReceiptModal()"
+                                    class="bg-indigo-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold hover:bg-indigo-800 shadow"
+                                    data-i18n="searchOldReceipt"
+                                >
+                                    🔍 পুরাতন রশীদ খুঁজুন
+                                </button>
+
+                            </div>
+
+
+                            <p
+                                class="text-xs text-gray-600 mb-4"
+                                data-i18n="receiptDescription"
+                            >
+                                টাকা জমা নিয়ে শিক্ষার্থী ও অফিস কপি জেনারেট করুন।
+                            </p>
+
+
+                            <label
+                                class="block text-xs font-bold text-gray-700 mb-1"
+                                data-i18n="selectReceiptClass"
+                            >
+                                শ্রেণি সিলেক্ট করুন:
+                            </label>
+
+
+                            <select
+                                id="receiptClassSelect"
+                                class="w-full border p-2 rounded-lg text-sm mb-3"
+                            >
+                                <option value="প্লে">প্লে</option>
+                                <option value="নার্সারি">নার্সারি</option>
+                                <option value="ওয়ান">ওয়ান</option>
+                                <option value="টু">টু</option>
+                                <option value="থ্রি">থ্রি</option>
+                                <option value="ফোর">ফোর</option>
+                                <option value="ফাইভ">ফাইভ</option>
+                            </select>
+
+
+                            <button
+                                onclick="openReceiptForm()"
+                                class="btn-success w-full"
+                                data-i18n="goToReceiptForm"
+                            >
+                                রশীদ ফর্মে যান
+                            </button>
+
+                        </div>
+
+
+                       <!-- Voucher Card -->
+                            <div class="bg-white p-6 rounded-xl shadow border border-gray-200 flex flex-col">
+
+                                <!-- OLD VOUCHER SEARCH -->
+                                <button
+                                    type="button"
+                                    onclick="openOldVoucherSearch()"
+                                    class="self-end bg-indigo-700 text-white text-xs px-3 py-1.5 rounded-lg font-bold hover:bg-indigo-800 shadow mb-2"
+                                    data-i18n="searchOldVoucher"
+                                >
+                                    🔍 পুরাতন বাউচার খুঁজুন
+                                </button>
+
+
+                                <h3 class="text-lg font-bold text-blue-900 mb-2 flex items-center">
+                                    <span class="mr-2">🧾</span>
+
+                                    <span data-i18n="institutionPaymentVoucher">
+                                        প্রতিষ্ঠানের পেমেন্ট ভাউচার
+                                    </span>
+                                </h3>
+
+
+                                <p
+                                    class="text-xs text-gray-600 mb-4"
+                                    data-i18n="institutionPaymentVoucherDescription"
+                                >
+                                    প্রতিষ্ঠানের বিভিন্ন অর্থ প্রদান ও খরচের জন্য পেমেন্ট ভাউচার তৈরি করুন।
+                                </p>
+
+
+                                <!-- Voucher Button -->
+                                <button
+                                    onclick="window.location.href='voucher.html'"
+                                    class="w-full bg-blue-900 text-white py-2 rounded-lg font-bold hover:bg-blue-800 transition mt-auto mb-[-4px]"
+                                    data-i18n="createVoucherButton"
+                                >
+                                    🧾 ভাউচার তৈরি করুন
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Monthly Bill Card -->
+                        <div
+                            class="bg-white p-6 rounded-xl shadow border border-gray-200 md:col-span-2 md:justify-self-center md:w-[calc(50%-12px)]"
+                        >
+
+                            <h3 class="text-lg font-bold text-blue-900 mb-2 flex items-center">
+                                <span class="mr-2">🔔</span>
+
+                                <span data-i18n="monthlyBillTitle">
+                                    প্রতি মাসের হিসাব দিন (বকেয়া বিল)
+                                </span>
+                            </h3>
+
+
+                            <p
+                                class="text-xs text-gray-600 mb-4"
+                                data-i18n="monthlyBillDescription"
+                            >
+                                মাসের শেষে বকেয়া তালিকা তৈরি করে প্রিন্ট বা হোয়াটসঅ্যাপে শেয়ার করুন।
+                            </p>
+
+
+                            <button
+                                onclick="triggerEndOfMonthAlert()"
+                                class="w-full bg-yellow-500 text-blue-950 py-2 rounded-lg font-bold hover:bg-yellow-400"
+                                data-i18n="giveMonthlyAccount"
+                            >
+                                প্রত্যেকের মাসের হিসাব দিন
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </section>
 
         <!-- D. CLASS DATABASE TABLE -->
         <section id="sec-classtable" class="hidden space-y-4 no-print">
@@ -602,12 +983,22 @@
 
         <!-- F. RECEIPT PREVIEW -->
         <section id="sec-receiptpreview" class="hidden">
-            <div class="flex justify-center space-x-3 mb-4 no-print">
+                <div class="flex flex-wrap justify-center space-x-3 mb-4 no-print">
+
                 <button id="btnReceiptPaid" onclick="markReceiptPaid()" class="btn-success shadow">পেইড (Paid)</button>
+
                 <button id="btnReceiptUpdate" onclick="updateEditedReceipt()" class="hidden bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded-lg font-bold shadow">আপডেট (Update)</button>
+
                 <button onclick="editReceiptForm()" class="bg-yellow-500 text-blue-900 px-6 py-2 rounded-lg font-bold shadow">এডিট (Edit)</button>
+
                 <button onclick="showSection('dashboard')" class="bg-red-600 text-white px-6 py-2 rounded-lg font-bold shadow">আনপেইড (Unpaid)</button>
+
                 <button onclick="downloadReceiptPDF()" class="bg-purple-700 text-white px-6 py-2 rounded-lg font-bold shadow hover:bg-purple-800">PDF ডাউনলোড</button>
+
+                <div class="basis-full flex justify-center">
+                    <button onclick="printReceipt()" class="bg-gray-700 text-white px-6 py-2 rounded-lg font-bold shadow hover:bg-gray-800">প্রিন্ট</button>
+                </div>
+
             </div>
 
             <div id="printableReceipt" class="bg-white p-4 max-w-4xl mx-auto border border-gray-400 space-y-6 text-black">
@@ -1004,5 +1395,81 @@
 
     <!-- JavaScript Engine -->
     <script src="dashboard.js"></script>
+
+
+
+                <!-- OLD VOUCHER SEARCH MODAL -->
+            <div
+                id="oldVoucherSearchModal"
+                class="fixed inset-0 bg-black/50 hidden z-[9999] flex items-center justify-center p-4"
+            >
+
+                <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-5">
+
+                    <div class="flex items-center justify-between mb-4">
+
+                        <h3 class="text-lg font-bold text-blue-900">
+                            🔍 পুরাতন বাউচার খুঁজুন
+                        </h3>
+
+                        <button
+                            type="button"
+                            onclick="closeOldVoucherSearch()"
+                            class="text-gray-500 hover:text-red-600 text-xl font-bold"
+                        >
+                            ×
+                        </button>
+
+                    </div>
+
+                    <!-- SESSION -->
+                    <div class="mb-3">
+
+                        <label class="block text-sm font-bold text-gray-700 mb-1">
+                            সেশন
+                        </label>
+
+                        <input
+                            type="text"
+                            id="oldVoucherSearchSession"
+                            readonly
+                            class="w-full border border-gray-300 bg-gray-100 rounded-lg p-2 text-sm font-bold text-center"
+                        >
+
+                    </div>
+
+                    <!-- DATE -->
+                    <div class="mb-4">
+
+                        <label class="block text-sm font-bold text-gray-700 mb-1">
+                            বাউচারের তারিখ
+                        </label>
+
+                        <input
+                            type="date"
+                            id="oldVoucherSearchDate"
+                            class="w-full border border-gray-300 rounded-lg p-2 text-sm font-bold text-center"
+                        >
+
+                    </div>
+
+                    <button
+                        type="button"
+                        onclick="searchOldVouchersByDate()"
+                        class="w-full bg-blue-900 text-white py-2 rounded-lg font-bold hover:bg-blue-800"
+                    >
+                        🔍 বাউচার খুঁজুন
+                    </button>
+
+                    <!-- RESULTS -->
+                    <div
+                        id="oldVoucherSearchResults"
+                        class="mt-4 max-h-64 overflow-y-auto space-y-2"
+                    ></div>
+
+                </div>
+
+            </div>
+
 </body>
 </html>

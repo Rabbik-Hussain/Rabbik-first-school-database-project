@@ -1,0 +1,4332 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>লার্নিং স্কুল — পেমেন্ট ভাউচার</title>
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <!-- PDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            font-family:
+                "Noto Sans Bengali",
+                "Nirmala UI",
+                "Segoe UI",
+                Arial,
+                sans-serif;
+
+            background: #eef2f7;
+            color: #111827;
+        }
+
+        button,
+        input,
+        select,
+        textarea {
+            font-family: inherit;
+        }
+
+        .page {
+            width: 100%;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .voucher-wrap {
+            width: 100%;
+            max-width: 960px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .voucher {
+            width: 100%;
+            background: #ffffff;
+            border: 2px solid #1e3a8a;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        /* =========================
+           BACK TO CASH COUNT
+        ========================= */
+
+        .back-cash-btn {
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            z-index: 9999;
+
+            border: 0;
+            border-radius: 8px;
+
+            background: #1e3a8a;
+            color: #ffffff;
+
+            padding: 8px 12px;
+
+            font-size: 12px;
+            font-weight: 800;
+
+            cursor: pointer;
+
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.18);
+
+            transition: 0.2s ease;
+        }
+
+        .back-cash-btn:hover {
+            background: #172554;
+            transform: translateY(-1px);
+        }
+
+        /* =========================
+           TOP BAR
+        ========================= */
+
+        .topbar {
+            background: #1e3a8a;
+            color: #ffffff;
+            min-height: 42px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 10px;
+            padding: 8px 14px;
+
+            font-size: 13px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .topbar-left,
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-align: center;
+        }
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            gap: 8px;
+
+            padding: 18px 20px 12px;
+
+            border-bottom: 1px solid #dbe3ef;
+
+            text-align: center;
+        }
+
+        .logo {
+            width: 72px;
+            height: 72px;
+            flex: 0 0 72px;
+
+            border-radius: 12px;
+            overflow: hidden;
+
+            border: 2px solid #1e3a8a;
+            background: #ffffff;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            margin: 0 auto;
+        }
+
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .school-info {
+            width: 100%;
+            min-width: 0;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            text-align: center;
+        }
+
+        .school-name {
+            margin: 0;
+
+            color: #1e3a8a;
+
+            font-size: 27px;
+            line-height: 1.25;
+
+            font-weight: 800;
+
+            text-align: center;
+        }
+
+        .school-address,
+        .school-mobile {
+            margin: 4px 0 0;
+
+            color: #4b5563;
+
+            font-size: 13px;
+            font-weight: 600;
+
+            text-align: center;
+        }
+
+        .voucher-title {
+            margin-top: 12px;
+
+            display: inline-block;
+
+            background: #facc15;
+            color: #172554;
+
+            padding: 7px 16px;
+
+            border-radius: 7px;
+
+            font-size: 16px;
+            font-weight: 800;
+
+            text-align: center;
+        }
+
+        /* =========================
+           META INFORMATION
+        ========================= */
+
+        .meta {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 10px;
+
+            padding: 15px 20px;
+
+            width: 100%;
+
+            text-align: center;
+        }
+
+        .meta-box {
+            border: 1px solid #cbd5e1;
+
+            border-radius: 8px;
+
+            overflow: hidden;
+
+            background: #f8fafc;
+
+            text-align: center;
+        }
+
+        .meta-label {
+            background: #e8eef8;
+
+            color: #1e3a8a;
+
+            padding: 6px 9px;
+
+            font-size: 11px;
+            font-weight: 800;
+
+            text-align: center;
+        }
+
+        .meta-value {
+            padding: 7px 9px;
+
+            min-height: 36px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            text-align: center;
+        }
+
+        .meta-value input {
+            width: 100%;
+
+            border: 0;
+            outline: 0;
+
+            background: transparent;
+
+            font-size: 13px;
+            font-weight: 700;
+
+            color: #111827;
+
+            text-align: center;
+        }
+
+        .meta-value input[type="date"] {
+            cursor: pointer;
+        }
+
+        .meta-value input:disabled {
+            cursor: not-allowed;
+            opacity: 0.85;
+        }
+
+        .session-display {
+            width: 100%;
+
+            font-size: 13px;
+            font-weight: 800;
+
+            color: #111827;
+
+            text-align: center;
+        }
+
+        /* =========================
+           EXPENSE TABLE
+        ========================= */
+
+        .table-wrap {
+            width: 100%;
+
+            overflow-x: auto;
+
+            padding: 0 20px;
+        }
+
+        .expense-table {
+            width: 100%;
+
+            min-width: 540px;
+
+            border-collapse: collapse;
+
+            table-layout: fixed;
+        }
+
+        .expense-table th,
+        .expense-table td {
+            border: 1px solid #9ca3af;
+
+            padding: 8px;
+
+            vertical-align: middle;
+
+            text-align: center;
+        }
+
+        .expense-table th {
+            background: #1e3a8a;
+            color: #ffffff;
+
+            text-align: center;
+
+            font-size: 12px;
+        }
+
+        .expense-table th:nth-child(1) {
+            width: 55px;
+        }
+
+        .expense-table th:nth-child(3) {
+            width: 170px;
+        }
+
+        .serial-cell {
+            text-align: center;
+
+            font-weight: 800;
+        }
+
+        .expense-input {
+            width: 100%;
+
+            min-height: 34px;
+
+            border: 1px solid #cbd5e1;
+
+            border-radius: 5px;
+
+            padding: 6px 8px;
+
+            outline: none;
+
+            background: #ffffff;
+
+            font-size: 13px;
+
+            text-align: center;
+        }
+
+        .expense-input:focus {
+            border-color: #1e3a8a;
+
+            box-shadow:
+                0 0 0 2px
+                rgba(30, 58, 138, 0.08);
+        }
+
+        .expense-input[readonly] {
+            background: #f8fafc;
+            cursor: not-allowed;
+        }
+
+        .amount-input {
+            text-align: center;
+
+            font-weight: 700;
+        }
+
+        .total-label {
+            text-align: center;
+
+            font-weight: 800;
+        }
+
+        .total-value {
+            text-align: center;
+
+            font-size: 15px;
+            font-weight: 900;
+
+            color: #1e3a8a;
+        }
+
+        /* =========================
+           WORDS + NOTE
+        ========================= */
+
+        .words-box,
+        .note-box {
+            margin: 14px 20px 0;
+
+            border: 1px solid #cbd5e1;
+
+            border-radius: 8px;
+
+            padding: 10px 12px;
+
+            background: #f8fafc;
+
+            text-align: center;
+        }
+
+        .words-title,
+        .note-title {
+            color: #1e3a8a;
+
+            font-size: 12px;
+            font-weight: 800;
+
+            margin-bottom: 4px;
+
+            text-align: center;
+        }
+
+        .amount-words {
+            font-size: 13px;
+
+            font-weight: 700;
+
+            line-height: 1.6;
+
+            min-height: 22px;
+
+            text-align: center;
+        }
+
+        .note-text {
+            font-size: 12px;
+
+            font-weight: 600;
+
+            line-height: 1.6;
+
+            text-align: center;
+        }
+
+        /* =========================
+           SIGNATURE AREA
+        ========================= */
+
+        .signature-area {
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            gap: 25px;
+
+            padding: 24px 20px 16px;
+
+            text-align: center;
+        }
+
+        .signature-box {
+            min-width: 0;
+
+            text-align: center;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .signature-image-area {
+            width: 100%;
+
+            height: 55px;
+
+            display: flex;
+
+            align-items: flex-end;
+
+            justify-content: center;
+
+            padding-bottom: 5px;
+        }
+
+        .signature-image-area img {
+            max-width: 130px;
+            max-height: 48px;
+
+            object-fit: contain;
+        }
+
+        .signature-controls {
+            width: 100%;
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 5px;
+
+            margin-bottom: 7px;
+        }
+
+        .signature-controls select {
+            width: 100%;
+
+            max-width: 260px;
+
+            border: 1px solid #cbd5e1;
+
+            border-radius: 6px;
+
+            padding: 7px 8px;
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+            background: #ffffff;
+
+            outline: none;
+
+            text-align: center;
+        }
+
+        .signature-controls button {
+            border: 0;
+
+            background: #1e3a8a;
+
+            color: #ffffff;
+
+            padding: 5px 15px;
+
+            border-radius: 5px;
+
+            font-size: 11px;
+
+            font-weight: 800;
+
+            cursor: pointer;
+
+            text-align: center;
+        }
+
+        .signature-controls button:hover {
+            background: #172554;
+        }
+
+        .signature-line {
+            width: 100%;
+
+            border-top: 1.5px solid #111827;
+
+            padding-top: 6px;
+
+            font-size: 12px;
+
+            font-weight: 800;
+
+            text-align: center;
+        }
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        .footer {
+            border-top: 1px solid #dbe3ef;
+
+            text-align: center;
+
+            padding: 10px 15px;
+
+            color: #6b7280;
+
+            font-size: 10px;
+
+            font-weight: 600;
+        }
+
+        /* =========================
+           ACTION BUTTONS
+        ========================= */
+
+        .actions {
+            width: 100%;
+
+            max-width: 960px;
+
+            margin: 16px auto 0;
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(5, 1fr);
+
+            gap: 10px;
+
+            justify-content: center;
+
+            align-items: center;
+        }
+
+        .action-btn {
+            width: 100%;
+
+            border: 0;
+
+            border-radius: 8px;
+
+            padding: 11px 12px;
+
+            color: #ffffff;
+
+            font-size: 13px;
+
+            font-weight: 800;
+
+            cursor: pointer;
+
+            transition: 0.2s ease;
+
+            text-align: center;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+
+            opacity: 0.94;
+        }
+
+        .edit-btn {
+            background: #d97706;
+        }
+
+        .update-btn {
+            background: #15803d;
+        }
+
+        .print-btn {
+            background: #1e3a8a;
+        }
+
+        .pdf-btn {
+            background: #b91c1c;
+        }
+
+        .share-btn {
+            background: #15803d;
+        }
+
+        .save-btn {
+            background: #7c3aed;
+        }
+
+        .back-action-btn {
+            background: #475569;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* =========================
+           960px AND BELOW
+        ========================= */
+
+        @media (max-width: 960px) {
+
+            .page {
+                padding: 14px;
+
+                align-items: center;
+            }
+
+            .voucher-wrap {
+                max-width: 100%;
+
+                align-items: center;
+            }
+
+            .voucher {
+                width: 100%;
+            }
+
+            .header {
+                align-items: center;
+
+                text-align: center;
+            }
+
+            .school-info {
+                align-items: center;
+
+                text-align: center;
+            }
+
+            .school-name {
+                font-size: 24px;
+
+                text-align: center;
+            }
+
+            /*
+                ৪০০px থেকে ৯৬০px:
+                দুইটি করে পাশাপাশি।
+            */
+
+            .actions {
+                grid-template-columns:
+                    repeat(2, 1fr);
+
+                justify-items: center;
+
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            /*
+                Edit / Update hidden থাকলে
+                Print-PDF-Share-Save
+                স্বাভাবিকভাবে ২টি করে থাকবে।
+            */
+
+            .back-action-btn {
+                grid-column: 1 / -1;
+            }
+
+        }
+
+        /* =========================
+           600px AND BELOW
+        ========================= */
+
+        @media (max-width: 600px) {
+
+            .page {
+                padding: 8px;
+
+                align-items: center;
+            }
+
+            .voucher-wrap {
+                align-items: center;
+            }
+
+            .voucher {
+                border-radius: 9px;
+            }
+
+            .back-cash-btn {
+                top: 6px;
+                left: 6px;
+
+                padding: 6px 8px;
+
+                font-size: 9px;
+            }
+
+            .topbar {
+                padding: 7px 10px;
+
+                font-size: 11px;
+
+                justify-content: center;
+
+                text-align: center;
+            }
+
+            .topbar-left,
+            .topbar-right {
+                justify-content: center;
+
+                text-align: center;
+            }
+
+            .header {
+                padding: 13px 12px 10px;
+
+                gap: 7px;
+
+                align-items: center;
+
+                text-align: center;
+            }
+
+            .logo {
+                width: 58px;
+                height: 58px;
+
+                flex-basis: 58px;
+
+                margin: 0 auto;
+            }
+
+            .school-name {
+                font-size: 20px;
+
+                text-align: center;
+            }
+
+            .school-address,
+            .school-mobile {
+                font-size: 10px;
+
+                text-align: center;
+            }
+
+            .voucher-title {
+                font-size: 12px;
+
+                padding: 5px 9px;
+
+                margin-top: 8px;
+
+                text-align: center;
+            }
+
+            .meta {
+                grid-template-columns:
+                    repeat(2, 1fr);
+
+                gap: 7px;
+
+                padding: 10px 12px;
+
+                text-align: center;
+            }
+
+            .meta-label {
+                font-size: 9px;
+
+                padding: 5px 7px;
+
+                text-align: center;
+            }
+
+            .meta-value {
+                padding: 5px 7px;
+
+                min-height: 31px;
+
+                justify-content: center;
+
+                text-align: center;
+            }
+
+            .meta-value input,
+            .session-display {
+                font-size: 11px;
+
+                text-align: center;
+            }
+
+            .table-wrap {
+                padding: 0 10px;
+            }
+
+            .expense-table {
+                min-width: 500px;
+            }
+
+            .expense-table th,
+            .expense-table td {
+                text-align: center;
+            }
+
+            .expense-input {
+                text-align: center;
+            }
+
+            .words-box,
+            .note-box {
+                margin-left: 10px;
+
+                margin-right: 10px;
+
+                text-align: center;
+            }
+
+            .signature-area {
+                gap: 10px;
+
+                padding-left: 10px;
+
+                padding-right: 10px;
+
+                text-align: center;
+            }
+
+            .signature-box {
+                align-items: center;
+
+                text-align: center;
+            }
+
+            .signature-controls {
+                align-items: center;
+
+                text-align: center;
+            }
+
+            .signature-controls select {
+                font-size: 9px;
+
+                text-align: center;
+            }
+
+            .signature-line {
+                font-size: 10px;
+
+                text-align: center;
+            }
+
+            /*
+                ৬০০px-এর নিচেও
+                ২টি করে পাশাপাশি থাকবে।
+            */
+
+            .actions {
+                grid-template-columns:
+                    repeat(2, 1fr);
+
+                gap: 8px;
+
+                margin-top: 10px;
+
+                margin-left: auto;
+
+                margin-right: auto;
+
+                justify-items: center;
+            }
+
+            .action-btn {
+                width: 100%;
+
+                padding: 10px;
+
+                font-size: 12px;
+
+                text-align: center;
+            }
+
+            .back-action-btn {
+                grid-column: 1 / -1;
+            }
+
+        }
+
+        /* =========================
+           400px AND BELOW
+        ========================= */
+
+        @media (max-width: 400px) {
+
+            .page {
+                padding: 4px;
+
+                align-items: center;
+            }
+
+            .voucher-wrap {
+                align-items: center;
+            }
+
+            .back-cash-btn {
+                top: 4px;
+                left: 4px;
+
+                padding: 5px 7px;
+
+                font-size: 8px;
+            }
+
+            .topbar {
+                font-size: 9px;
+
+                padding: 6px 7px;
+
+                justify-content: center;
+
+                text-align: center;
+            }
+
+            .header {
+                padding: 10px 8px 8px;
+
+                align-items: center;
+
+                text-align: center;
+            }
+
+            .logo {
+                width: 48px;
+                height: 48px;
+
+                flex-basis: 48px;
+
+                margin: 0 auto;
+            }
+
+            .school-name {
+                font-size: 17px;
+
+                text-align: center;
+            }
+
+            .school-address,
+            .school-mobile {
+                font-size: 8px;
+
+                margin-top: 2px;
+
+                text-align: center;
+            }
+
+            .voucher-title {
+                font-size: 10px;
+
+                padding: 4px 7px;
+
+                margin-top: 5px;
+
+                text-align: center;
+            }
+
+            .meta {
+                padding: 8px;
+
+                gap: 5px;
+
+                text-align: center;
+            }
+
+            .meta-label {
+                font-size: 8px;
+
+                text-align: center;
+            }
+
+            .meta-value input,
+            .session-display {
+                font-size: 9px;
+
+                text-align: center;
+            }
+
+            .table-wrap {
+                padding: 0 6px;
+            }
+
+            .expense-table {
+                min-width: 470px;
+            }
+
+            .expense-table th,
+            .expense-table td {
+                text-align: center;
+            }
+
+            .expense-input {
+                text-align: center;
+            }
+
+            .words-box,
+            .note-box {
+                margin-left: 6px;
+
+                margin-right: 6px;
+
+                text-align: center;
+            }
+
+            .words-title,
+            .note-title,
+            .amount-words,
+            .note-text {
+                text-align: center;
+            }
+
+            .signature-area {
+                padding-left: 6px;
+
+                padding-right: 6px;
+
+                gap: 6px;
+
+                text-align: center;
+            }
+
+            .signature-box {
+                align-items: center;
+
+                text-align: center;
+            }
+
+            .signature-image-area {
+                height: 45px;
+            }
+
+            .signature-image-area img {
+                max-width: 90px;
+
+                max-height: 38px;
+            }
+
+            .signature-controls {
+                align-items: center;
+
+                text-align: center;
+            }
+
+            .signature-controls select {
+                font-size: 8px;
+
+                padding: 5px;
+
+                text-align: center;
+            }
+
+            .signature-controls button {
+                font-size: 9px;
+
+                padding: 4px 10px;
+
+                text-align: center;
+            }
+
+            .signature-line {
+                font-size: 8px;
+
+                text-align: center;
+            }
+
+            /*
+                ৪০০px-এর নিচে:
+                সবগুলো এক কলামে।
+            */
+
+            .actions {
+                grid-template-columns:
+                    1fr;
+
+                gap: 8px;
+
+                margin-top: 10px;
+            }
+
+            .action-btn {
+                width: 100%;
+
+                padding: 10px;
+
+                font-size: 12px;
+
+                text-align: center;
+            }
+
+            .back-action-btn {
+                grid-column: auto;
+            }
+
+        }
+
+        /* =========================
+           PRINT
+        ========================= */
+
+        @media print {
+
+            @page {
+                size: A4 portrait;
+
+                margin: 8mm;
+            }
+
+            body {
+                background: #ffffff;
+            }
+
+            .page {
+                padding: 0;
+
+                display: block;
+            }
+
+            .voucher-wrap {
+                max-width: none;
+
+                display: block;
+            }
+
+            .voucher {
+                border: 1.5px solid #1e3a8a;
+
+                box-shadow: none;
+
+                border-radius: 0;
+            }
+
+            .no-print,
+            .actions,
+            .back-cash-btn {
+                display: none !important;
+            }
+
+            .signature-controls {
+                display: none !important;
+            }
+
+            .signature-image-area {
+                height: 55px;
+            }
+
+            .header,
+            .school-info,
+            .school-name,
+            .school-address,
+            .school-mobile,
+            .voucher-title,
+            .meta,
+            .meta-box,
+            .meta-label,
+            .meta-value,
+            .expense-table th,
+            .expense-table td,
+            .words-box,
+            .note-box,
+            .words-title,
+            .note-title,
+            .amount-words,
+            .note-text,
+            .signature-area,
+            .signature-box,
+            .signature-line,
+            .footer {
+                text-align: center;
+            }
+
+        }
+
+    </style>
+</head>
+
+<body>
+
+<!-- BACK TO CASH COUNT -->
+<button
+    type="button"
+    class="back-cash-btn no-print"
+    onclick="goBackToCashCount()"
+>
+    ← ক্যাশ কাউন্টে ফিরে যান
+</button>
+
+
+<div class="page">
+
+    <div class="voucher-wrap">
+
+        <div class="voucher" id="voucher">
+
+            <!-- TOP BAR -->
+            <div class="topbar no-print">
+
+                <div class="topbar-left">
+                    <span>লার্নিং স্কুল</span>
+                </div>
+
+                <div class="topbar-right">
+                    <span>পেমেন্ট ভাউচার</span>
+                </div>
+
+            </div>
+
+            <!-- HEADER -->
+            <div class="header">
+
+                <div class="logo">
+                    <img
+                        src="image/logo.jpg"
+                        alt="Learning School Logo"
+                    >
+                </div>
+
+                <div class="school-info">
+
+                    <h1 class="school-name">
+                        লার্নিং স্কুল
+                    </h1>
+
+                    <p class="school-address">
+                        ছত্তিশ, ফেঞ্চুগঞ্জ, সিলেট
+                    </p>
+
+                    <p class="school-mobile">
+                        মোবাইল: ০১৭৩৭-৭৫৭৭৬১
+                    </p>
+
+                    <div class="voucher-title">
+                        প্রতিষ্ঠানের পেমেন্ট ভাউচার
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- META -->
+            <div class="meta">
+
+                <div class="meta-box">
+
+                    <div class="meta-label">
+                        ভাউচার নং
+                    </div>
+
+                    <div class="meta-value">
+
+                        <input
+                            type="text"
+                            id="voucherNo"
+                            readonly
+                        >
+
+                    </div>
+
+                </div>
+
+                <div class="meta-box">
+
+                    <div class="meta-label">
+                        তারিখ
+                    </div>
+
+                    <div class="meta-value">
+
+                        <input
+                            type="date"
+                            id="voucherDate"
+                        >
+
+                    </div>
+
+                </div>
+
+                <div class="meta-box">
+
+                    <div class="meta-label">
+                        সেশন
+                    </div>
+
+                    <div class="meta-value">
+
+                        <div
+                            id="voucherSession"
+                            class="session-display"
+                        >
+                            -
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- EXPENSE TABLE -->
+            <div class="table-wrap">
+
+                <table class="expense-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                ক্রমিক
+                            </th>
+
+                            <th>
+                                খরচের বিবরণ
+                            </th>
+
+                            <th>
+                                টাকার পরিমাণ
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="expenseBody">
+
+                        <tr class="expense-row">
+
+                            <td class="serial-cell">
+                                1
+                            </td>
+
+                            <td>
+
+                                <input
+                                    type="text"
+                                    class="expense-input description-input"
+                                    placeholder="খরচের বিবরণ লিখুন"
+                                >
+
+                            </td>
+
+                            <td>
+
+                                <input
+                                    type="number"
+                                    class="expense-input amount-input"
+                                    min="0"
+                                    step="0.01"
+                                    placeholder="0"
+                                >
+
+                            </td>
+
+                        </tr>
+
+                        <tr id="totalRow">
+
+                            <td
+                                colspan="2"
+                                class="total-label"
+                            >
+                                সর্বমোট
+                            </td>
+
+                            <td
+                                id="totalAmount"
+                                class="total-value"
+                            >
+                                ০
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <!-- AMOUNT IN WORDS -->
+            <div class="words-box">
+
+                <div class="words-title">
+                    কথায়:
+                </div>
+
+                <div
+                    id="amountWords"
+                    class="amount-words"
+                >
+                    শূন্য টাকা মাত্র
+                </div>
+
+            </div>
+
+            <!-- NOTE -->
+            <div class="note-box">
+
+                <div class="note-title">
+                    মন্তব্য
+                </div>
+
+                <div class="note-text">
+                    উপরোক্ত অর্থ প্রতিষ্ঠানের হিসাব অনুযায়ী গ্রহণ/প্রদান করা হলো।
+                </div>
+
+            </div>
+
+            <!-- SIGNATURE AREA -->
+            <div class="signature-area">
+
+                <!-- PROVIDER SIGNATURE -->
+                <div class="signature-box">
+
+                    <div class="signature-image-area">
+
+                        <img
+                            id="voucherCollectorSigImg"
+                            class="hidden"
+                            alt="Signature"
+                        >
+
+                    </div>
+
+                    <div
+                        id="voucherCollectorControls"
+                        class="signature-controls no-print"
+                    >
+
+                        <select
+                            id="voucherCollectorSelect"
+                            onchange="voucherSignatureSelectionChanged('collector')"
+                        >
+
+                            <option value="">
+                                প্রদানকারী সিলেক্ট করুন
+                            </option>
+
+                        </select>
+
+                        <button
+                            id="voucherCollectorApply"
+                            class="hidden"
+                            onclick="applyVoucherSignature('collector')"
+                        >
+                            ওকে
+                        </button>
+
+                    </div>
+
+                    <div class="signature-line">
+                        প্রদানকারীর স্বাক্ষর
+                    </div>
+
+                </div>
+
+                <!-- HEAD TEACHER SIGNATURE -->
+                <div class="signature-box">
+
+                    <div class="signature-image-area">
+
+                        <img
+                            id="voucherHeadSigImg"
+                            class="hidden"
+                            alt="Head Teacher Signature"
+                        >
+
+                    </div>
+
+                    <div
+                        id="voucherHeadControls"
+                        class="signature-controls no-print"
+                    >
+
+                        <select
+                            id="voucherHeadSelect"
+                            onchange="voucherSignatureSelectionChanged('head')"
+                        >
+
+                            <option value="">
+                                প্রধান শিক্ষক সিলেক্ট করুন
+                            </option>
+
+                        </select>
+
+                        <button
+                            id="voucherHeadApply"
+                            class="hidden"
+                            onclick="applyVoucherSignature('head')"
+                        >
+                            ওকে
+                        </button>
+
+                    </div>
+
+                    <div class="signature-line">
+                        প্রধান শিক্ষক
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- FOOTER -->
+            <div class="footer">
+                এটি একটি কম্পিউটার-জেনারেটেড ভাউচার।
+            </div>
+
+        </div>
+
+
+        <!-- ACTION BUTTONS -->
+        <div class="actions no-print">
+
+            <!-- EDIT -->
+            <button
+                id="voucherEditBtn"
+                class="action-btn edit-btn hidden"
+                onclick="editOldVoucher()"
+            >
+                <i class="fa-solid fa-pen-to-square"></i>
+                এডিট
+            </button>
+
+            <!-- UPDATE -->
+            <button
+                id="voucherUpdateBtn"
+                class="action-btn update-btn hidden"
+                onclick="updateOldVoucher()"
+            >
+                <i class="fa-solid fa-arrows-rotate"></i>
+                আপডেট
+            </button>
+
+            <!-- PRINT -->
+            <button
+                class="action-btn print-btn"
+                onclick="printVoucher()"
+            >
+                <i class="fa-solid fa-print"></i>
+                প্রিন্ট
+            </button>
+
+            <!-- PDF -->
+            <button
+                class="action-btn pdf-btn"
+                onclick="downloadVoucherPDF()"
+            >
+                <i class="fa-solid fa-file-pdf"></i>
+                PDF
+            </button>
+
+            <!-- WHATSAPP -->
+            <button
+                class="action-btn share-btn"
+                onclick="shareVoucherWhatsApp()"
+            >
+                <i class="fa-brands fa-whatsapp"></i>
+                শেয়ার
+            </button>
+
+            <!-- SAVE -->
+            <button
+                id="voucherSaveBtn"
+                class="action-btn save-btn"
+                onclick="saveVoucherManually()"
+            >
+                <i class="fa-solid fa-floppy-disk"></i>
+                সেভ
+            </button>
+
+            <!-- BACK -->
+            <button
+                type="button"
+                class="action-btn back-action-btn"
+                onclick="goBackToCashCount()"
+            >
+                <i class="fa-solid fa-arrow-left"></i>
+                পিছনে যান
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    /* =========================================================
+       BASIC SETTINGS
+    ========================================================= */
+
+    const VOUCHER_COUNTER_KEY =
+        'LS_VOUCHER_COUNTER';
+
+    const SAVED_VOUCHERS_KEY =
+        'LS_SAVED_VOUCHERS';
+
+    let currentVoucherNumber = '';
+
+    let oldVoucherMode = false;
+
+    let editingVoucherNumber = null;
+
+    let voucherUpdateMode = false;
+
+
+    /* =========================================================
+       BANGLA NUMBER
+    ========================================================= */
+
+    const banglaDigits = {
+
+        '0': '০',
+        '1': '১',
+        '2': '২',
+        '3': '৩',
+        '4': '৪',
+        '5': '৫',
+        '6': '৬',
+        '7': '৭',
+        '8': '৮',
+        '9': '৯'
+
+    };
+
+
+    function toBanglaNumber(value) {
+
+        return String(value).replace(
+            /[0-9]/g,
+            digit =>
+                banglaDigits[digit]
+        );
+
+    }
+
+
+    /* =========================================================
+       TODAY
+    ========================================================= */
+
+    function getTodayForInput() {
+
+        const now =
+            new Date();
+
+        const year =
+            now.getFullYear();
+
+        const month =
+            String(
+                now.getMonth() + 1
+            ).padStart(2, '0');
+
+        const day =
+            String(
+                now.getDate()
+            ).padStart(2, '0');
+
+        return `${year}-${month}-${day}`;
+
+    }
+
+
+    /* =========================================================
+       SESSION
+    ========================================================= */
+
+    function getCurrentVoucherSession() {
+
+        let session =
+            localStorage.getItem(
+                'LS_CURRENT_SESSION'
+            );
+
+        if (!session) {
+
+            session =
+                localStorage.getItem(
+                    'currentSession'
+                );
+
+        }
+
+        if (!session) {
+
+            session =
+                localStorage.getItem(
+                    'LS_SESSION'
+                );
+
+        }
+
+        return session || '-';
+
+    }
+
+
+    /* =========================================================
+       VOUCHER SERIAL
+    ========================================================= */
+
+    function generateNextVoucherNumber() {
+
+        let counter =
+            parseInt(
+                localStorage.getItem(
+                    VOUCHER_COUNTER_KEY
+                ) || '0',
+                10
+            );
+
+        counter++;
+
+        localStorage.setItem(
+            VOUCHER_COUNTER_KEY,
+            counter
+        );
+
+        currentVoucherNumber =
+            `A${counter}`;
+
+        const voucherNo =
+            document.getElementById(
+                'voucherNo'
+            );
+
+        if (voucherNo) {
+
+            voucherNo.value =
+                currentVoucherNumber;
+
+        }
+
+    }
+
+
+    /* =========================================================
+       SAVED VOUCHERS
+    ========================================================= */
+
+    function getSavedVouchers() {
+
+        try {
+
+            const raw =
+                localStorage.getItem(
+                    SAVED_VOUCHERS_KEY
+                );
+
+            if (!raw) {
+
+                return [];
+
+            }
+
+            const parsed =
+                JSON.parse(raw);
+
+            return Array.isArray(parsed)
+                ? parsed
+                : [];
+
+        }
+
+        catch (error) {
+
+            console.error(
+                'Voucher storage error:',
+                error
+            );
+
+            return [];
+
+        }
+
+    }
+
+
+    function saveAllVouchers(vouchers) {
+
+        localStorage.setItem(
+            SAVED_VOUCHERS_KEY,
+            JSON.stringify(vouchers)
+        );
+
+    }
+
+
+    /* =========================================================
+       TEACHER DATA
+    ========================================================= */
+
+    function getVoucherTeachers() {
+
+        try {
+
+            const raw =
+                localStorage.getItem(
+                    'LS_REGISTERED_TEACHERS'
+                );
+
+            if (!raw) {
+                return [];
+            }
+
+            const parsed =
+                JSON.parse(raw);
+
+            if (Array.isArray(parsed)) {
+
+                const teachers = [];
+
+                parsed.forEach(item => {
+
+                    if (
+                        typeof item ===
+                        'object' &&
+                        item !== null
+                    ) {
+
+                        teachers.push(item);
+
+                    }
+
+                    else if (
+                        typeof item ===
+                        'string'
+                    ) {
+
+                        const teacherData =
+                            localStorage.getItem(
+                                item
+                            );
+
+                        if (teacherData) {
+
+                            try {
+
+                                const teacher =
+                                    JSON.parse(
+                                        teacherData
+                                    );
+
+                                if (teacher) {
+
+                                    teachers.push(
+                                        teacher
+                                    );
+
+                                }
+
+                            }
+
+                            catch (e) {}
+
+                        }
+
+                    }
+
+                });
+
+                return teachers;
+
+            }
+
+        }
+
+        catch (e) {
+
+            console.error(
+                'Teacher data error:',
+                e
+            );
+
+        }
+
+        return [];
+
+    }
+
+
+    /* =========================================================
+       POPULATE SIGNATURE DROPDOWNS
+    ========================================================= */
+
+    function populateVoucherSignatureDropdowns() {
+
+        const teachers =
+            getVoucherTeachers();
+
+        const collectorSelect =
+            document.getElementById(
+                'voucherCollectorSelect'
+            );
+
+        const headSelect =
+            document.getElementById(
+                'voucherHeadSelect'
+            );
+
+
+        if (collectorSelect) {
+
+            collectorSelect.innerHTML =
+                `<option value="">
+                    প্রদানকারী সিলেক্ট করুন
+                </option>`;
+
+            teachers.forEach(teacher => {
+
+                if (!teacher.teacherId) {
+                    return;
+                }
+
+                const option =
+                    document.createElement(
+                        'option'
+                    );
+
+                option.value =
+                    teacher.teacherId;
+
+                option.textContent =
+                    `${teacher.firstName || ''} ${teacher.lastName || ''} (${teacher.teacherId})`;
+
+                collectorSelect.appendChild(
+                    option
+                );
+
+            });
+
+        }
+
+
+        if (headSelect) {
+
+            headSelect.innerHTML =
+                `<option value="">
+                    প্রধান শিক্ষক সিলেক্ট করুন
+                </option>`;
+
+            teachers.forEach(teacher => {
+
+                if (
+                    teacher.designation ===
+                    'head_teacher'
+                ) {
+
+                    const option =
+                        document.createElement(
+                            'option'
+                        );
+
+                    option.value =
+                        teacher.teacherId;
+
+                    option.textContent =
+                        `${teacher.firstName || ''} ${teacher.lastName || ''} (${teacher.teacherId})`;
+
+                    headSelect.appendChild(
+                        option
+                    );
+
+                }
+
+            });
+
+        }
+
+    }
+
+
+    /* =========================================================
+       SIGNATURE SELECTION
+    ========================================================= */
+
+    function voucherSignatureSelectionChanged(type) {
+
+        const selectId =
+            type === 'collector'
+                ? 'voucherCollectorSelect'
+                : 'voucherHeadSelect';
+
+        const buttonId =
+            type === 'collector'
+                ? 'voucherCollectorApply'
+                : 'voucherHeadApply';
+
+        const selectEl =
+            document.getElementById(
+                selectId
+            );
+
+        const buttonEl =
+            document.getElementById(
+                buttonId
+            );
+
+        if (
+            !selectEl ||
+            !buttonEl
+        ) {
+            return;
+        }
+
+        if (selectEl.value) {
+
+            buttonEl.classList.remove(
+                'hidden'
+            );
+
+        }
+
+        else {
+
+            buttonEl.classList.add(
+                'hidden'
+            );
+
+        }
+
+    }
+
+
+    /* =========================================================
+       APPLY SIGNATURE
+    ========================================================= */
+
+    function applyVoucherSignature(type) {
+
+        const selectId =
+            type === 'collector'
+                ? 'voucherCollectorSelect'
+                : 'voucherHeadSelect';
+
+        const imgId =
+            type === 'collector'
+                ? 'voucherCollectorSigImg'
+                : 'voucherHeadSigImg';
+
+        const controlsId =
+            type === 'collector'
+                ? 'voucherCollectorControls'
+                : 'voucherHeadControls';
+
+
+        const selectEl =
+            document.getElementById(
+                selectId
+            );
+
+        const imgEl =
+            document.getElementById(
+                imgId
+            );
+
+        const controlsEl =
+            document.getElementById(
+                controlsId
+            );
+
+
+        if (
+            !selectEl ||
+            !imgEl
+        ) {
+            return;
+        }
+
+
+        const selectedId =
+            selectEl.value;
+
+
+        if (!selectedId) {
+
+            alert(
+                'অনুগ্রহ করে নাম সিলেক্ট করুন।'
+            );
+
+            return;
+
+        }
+
+
+        const teachers =
+            getVoucherTeachers();
+
+
+        const teacher =
+            teachers.find(
+                t =>
+                    t.teacherId ===
+                    selectedId
+            );
+
+
+        if (
+            teacher &&
+            teacher.signature
+        ) {
+
+            imgEl.src =
+                teacher.signature;
+
+            imgEl.classList.remove(
+                'hidden'
+            );
+
+
+            if (controlsEl) {
+
+                controlsEl.classList.add(
+                    'hidden'
+                );
+
+            }
+
+
+            /*
+                নতুন Voucher হলে signature
+                change হওয়ার পর save হবে।
+            */
+
+            if (!oldVoucherMode) {
+
+                saveCurrentVoucher();
+
+            }
+
+        }
+
+        else {
+
+            alert(
+                'এই শিক্ষকের কোনো সিগনেচার পাওয়া যায়নি!'
+            );
+
+            imgEl.src = '';
+
+            imgEl.classList.add(
+                'hidden'
+            );
+
+        }
+
+    }
+
+
+    /* =========================================================
+       GET CURRENT SIGNATURE IDS
+    ========================================================= */
+
+    function getCurrentSignatureData() {
+
+        return {
+
+            collectorId:
+                document.getElementById(
+                    'voucherCollectorSelect'
+                )?.value || '',
+
+            headTeacherId:
+                document.getElementById(
+                    'voucherHeadSelect'
+                )?.value || ''
+
+        };
+
+    }
+
+
+    /* =========================================================
+       ADD NEW EXPENSE ROW
+    ========================================================= */
+
+    function addExpenseRow() {
+
+        const tbody =
+            document.getElementById(
+                'expenseBody'
+            );
+
+        const totalRow =
+            document.getElementById(
+                'totalRow'
+            );
+
+        if (
+            !tbody ||
+            !totalRow
+        ) {
+            return;
+        }
+
+
+        const rows =
+            tbody.querySelectorAll(
+                '.expense-row'
+            );
+
+        const serial =
+            rows.length + 1;
+
+
+        const row =
+            document.createElement(
+                'tr'
+            );
+
+        row.className =
+            'expense-row';
+
+
+        row.innerHTML = `
+
+            <td class="serial-cell">
+                ${serial}
+            </td>
+
+            <td>
+
+                <input
+                    type="text"
+                    class="expense-input description-input"
+                    placeholder="খরচের বিবরণ লিখুন"
+                >
+
+            </td>
+
+            <td>
+
+                <input
+                    type="number"
+                    class="expense-input amount-input"
+                    min="0"
+                    step="0.01"
+                    placeholder="0"
+                >
+
+            </td>
+
+        `;
+
+
+        tbody.insertBefore(
+            row,
+            totalRow
+        );
+
+
+        attachRowEvents(
+            row
+        );
+
+
+        updateTotal();
+
+
+        const descriptionInput =
+            row.querySelector(
+                '.description-input'
+            );
+
+
+        if (descriptionInput) {
+
+            descriptionInput.focus();
+
+        }
+
+    }
+
+
+    /* =========================================================
+       ROW EVENTS
+    ========================================================= */
+
+    function attachRowEvents(row) {
+
+        const description =
+            row.querySelector(
+                '.description-input'
+            );
+
+        const amount =
+            row.querySelector(
+                '.amount-input'
+            );
+
+
+        if (amount) {
+
+            amount.addEventListener(
+                'input',
+                function() {
+
+                    updateTotal();
+
+                    if (!oldVoucherMode) {
+
+                        saveCurrentVoucher();
+
+                    }
+
+                    else if (
+                        voucherUpdateMode
+                    ) {
+
+                        updateTotal();
+
+                    }
+
+                }
+            );
+
+
+            amount.addEventListener(
+                'keydown',
+                function(event) {
+
+                    if (
+                        event.key ===
+                        'Enter'
+                    ) {
+
+                        event.preventDefault();
+
+
+                        /*
+                            পুরাতন Voucher-এর
+                            Edit mode-এ নতুন row
+                            যোগ হবে না।
+                        */
+
+                        if (
+                            oldVoucherMode
+                        ) {
+
+                            return;
+
+                        }
+
+
+                        addExpenseRow();
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        if (description) {
+
+            description.addEventListener(
+                'input',
+                function() {
+
+                    if (!oldVoucherMode) {
+
+                        saveCurrentVoucher();
+
+                    }
+
+                }
+            );
+
+
+            description.addEventListener(
+                'keydown',
+                function(event) {
+
+                    /*
+                        Normal Tab behaviour
+                        unchanged.
+                    */
+
+                }
+            );
+
+        }
+
+    }
+
+
+    /* =========================================================
+       UPDATE TOTAL
+    ========================================================= */
+
+    function updateTotal() {
+
+        const amountInputs =
+            document.querySelectorAll(
+                '.amount-input'
+            );
+
+
+        let total = 0;
+
+
+        amountInputs.forEach(input => {
+
+            const value =
+                parseFloat(
+                    input.value
+                );
+
+
+            if (
+                !isNaN(value) &&
+                value > 0
+            ) {
+
+                total += value;
+
+            }
+
+        });
+
+
+        const totalElement =
+            document.getElementById(
+                'totalAmount'
+            );
+
+
+        if (totalElement) {
+
+            totalElement.textContent =
+                formatMoneyBangla(
+                    total
+                );
+
+        }
+
+
+        const wordsElement =
+            document.getElementById(
+                'amountWords'
+            );
+
+
+        if (wordsElement) {
+
+            wordsElement.textContent =
+                amountToBanglaWords(
+                    total
+                );
+
+        }
+
+    }
+
+
+    /* =========================================================
+       MONEY FORMAT
+    ========================================================= */
+
+    function formatMoneyBangla(amount) {
+
+        const fixed =
+            Number(amount).toFixed(2);
+
+        const parts =
+            fixed.split('.');
+
+
+        let integerPart =
+            parseInt(
+                parts[0],
+                10
+            );
+
+
+        const decimalPart =
+            parseInt(
+                parts[1],
+                10
+            );
+
+
+        let result =
+            toBanglaNumber(
+                integerPart.toLocaleString(
+                    'en-US'
+                )
+            );
+
+
+        if (decimalPart > 0) {
+
+            result +=
+                '.' +
+                toBanglaNumber(
+                    String(
+                        decimalPart
+                    ).padStart(
+                        2,
+                        '0'
+                    )
+                );
+
+        }
+
+
+        return result;
+
+    }
+
+
+    /* =========================================================
+       BANGLA WORDS
+    ========================================================= */
+
+    const onesBn = [
+
+        '',
+        'এক',
+        'দুই',
+        'তিন',
+        'চার',
+        'পাঁচ',
+        'ছয়',
+        'সাত',
+        'আট',
+        'নয়'
+
+    ];
+
+
+    const teensBn = [
+
+        'দশ',
+        'এগারো',
+        'বারো',
+        'তেরো',
+        'চৌদ্দ',
+        'পনেরো',
+        'ষোল',
+        'সতেরো',
+        'আঠারো',
+        'উনিশ'
+
+    ];
+
+
+    const tensBn = [
+
+        '',
+        '',
+        'বিশ',
+        'ত্রিশ',
+        'চল্লিশ',
+        'পঞ্চাশ',
+        'ষাট',
+        'সত্তর',
+        'আশি',
+        'নব্বই'
+
+    ];
+
+
+    function twoDigitBanglaWords(number) {
+
+        number =
+            Math.floor(
+                number
+            );
+
+
+        if (number < 10) {
+
+            return onesBn[number];
+
+        }
+
+
+        if (number < 20) {
+
+            return teensBn[
+                number - 10
+            ];
+
+        }
+
+
+        const ten =
+            Math.floor(
+                number / 10
+            );
+
+
+        const one =
+            number % 10;
+
+
+        return (
+            tensBn[ten] +
+            (
+                one
+                    ? ' ' +
+                      onesBn[one]
+                    : ''
+            )
+        );
+
+    }
+
+
+    function numberToBanglaWords(number) {
+
+        number =
+            Math.floor(
+                Number(number)
+            );
+
+
+        if (!number) {
+
+            return 'শূন্য';
+
+        }
+
+
+        let words = [];
+
+
+        const crore =
+            Math.floor(
+                number / 10000000
+            );
+
+
+        number %= 10000000;
+
+
+        const lakh =
+            Math.floor(
+                number / 100000
+            );
+
+
+        number %= 100000;
+
+
+        const thousand =
+            Math.floor(
+                number / 1000
+            );
+
+
+        number %= 1000;
+
+
+        const hundred =
+            Math.floor(
+                number / 100
+            );
+
+
+        number %= 100;
+
+
+        if (crore) {
+
+            words.push(
+                numberToBanglaWords(
+                    crore
+                ) +
+                ' কোটি'
+            );
+
+        }
+
+
+        if (lakh) {
+
+            words.push(
+                numberToBanglaWords(
+                    lakh
+                ) +
+                ' লাখ'
+            );
+
+        }
+
+
+        if (thousand) {
+
+            words.push(
+                numberToBanglaWords(
+                    thousand
+                ) +
+                ' হাজার'
+            );
+
+        }
+
+
+        if (hundred) {
+
+            words.push(
+                onesBn[hundred] +
+                ' শত'
+            );
+
+        }
+
+
+        if (number) {
+
+            words.push(
+                twoDigitBanglaWords(
+                    number
+                )
+            );
+
+        }
+
+
+        return words.join(' ');
+
+    }
+
+
+    function amountToBanglaWords(amount) {
+
+        amount =
+            Number(amount) || 0;
+
+
+        const taka =
+            Math.floor(
+                amount
+            );
+
+
+        const paisa =
+            Math.round(
+                (amount - taka) * 100
+            );
+
+
+        let result =
+            numberToBanglaWords(
+                taka
+            ) +
+            ' টাকা';
+
+
+        if (paisa > 0) {
+
+            result +=
+                ' ' +
+                numberToBanglaWords(
+                    paisa
+                ) +
+                ' পয়সা';
+
+        }
+
+
+        result +=
+            ' মাত্র';
+
+
+        return result;
+
+    }
+
+
+    /* =========================================================
+       CURRENT VOUCHER DATA
+    ========================================================= */
+
+    function getCurrentVoucherData() {
+
+        const rows =
+            document.querySelectorAll(
+                '.expense-row'
+            );
+
+        const expenses = [];
+
+
+        rows.forEach(row => {
+
+            const description =
+                row.querySelector(
+                    '.description-input'
+                );
+
+            const amount =
+                row.querySelector(
+                    '.amount-input'
+                );
+
+
+            const descriptionValue =
+                description
+                    ? description.value.trim()
+                    : '';
+
+
+            const amountValue =
+                amount
+                    ? parseFloat(
+                        amount.value
+                    ) || 0
+                    : 0;
+
+
+            if (
+                descriptionValue ||
+                amountValue > 0
+            ) {
+
+                expenses.push({
+
+                    description:
+                        descriptionValue,
+
+                    amount:
+                        amountValue
+
+                });
+
+            }
+
+        });
+
+
+        const signatureData =
+            getCurrentSignatureData();
+
+
+        return {
+
+            voucherNo:
+                document.getElementById(
+                    'voucherNo'
+                )?.value || '',
+
+            date:
+                document.getElementById(
+                    'voucherDate'
+                )?.value || '',
+
+            session:
+                document.getElementById(
+                    'voucherSession'
+                )?.textContent || '',
+
+            expenses:
+                expenses,
+
+            collectorId:
+                signatureData.collectorId,
+
+            headTeacherId:
+                signatureData.headTeacherId,
+
+            total:
+                calculateVoucherTotal(),
+
+            totalBangla:
+                document.getElementById(
+                    'totalAmount'
+                )?.textContent || '০',
+
+            amountWords:
+                document.getElementById(
+                    'amountWords'
+                )?.textContent ||
+                'শূন্য টাকা মাত্র'
+
+        };
+
+    }
+
+
+    function calculateVoucherTotal() {
+
+        const amountInputs =
+            document.querySelectorAll(
+                '.amount-input'
+            );
+
+
+        let total = 0;
+
+
+        amountInputs.forEach(input => {
+
+            const value =
+                parseFloat(
+                    input.value
+                );
+
+
+            if (
+                !isNaN(value) &&
+                value > 0
+            ) {
+
+                total += value;
+
+            }
+
+        });
+
+
+        return total;
+
+    }
+
+
+    /* =========================================================
+       SAVE CURRENT NEW VOUCHER
+    ========================================================= */
+
+    function saveCurrentVoucher() {
+
+        /*
+            পুরাতন Voucher load/edit mode-এ
+            automatic new save হবে না।
+        */
+
+        if (oldVoucherMode) {
+
+            return;
+
+        }
+
+
+        const voucher =
+            getCurrentVoucherData();
+
+
+        if (!voucher.voucherNo) {
+
+            return;
+
+        }
+
+
+        if (!voucher.date) {
+
+            return;
+
+        }
+
+
+        if (!voucher.expenses.length) {
+
+            return;
+
+        }
+
+
+        const vouchers =
+            getSavedVouchers();
+
+
+        const existingIndex =
+            vouchers.findIndex(
+                item =>
+                    item.voucherNo ===
+                    voucher.voucherNo
+            );
+
+
+        if (
+            existingIndex >= 0
+        ) {
+
+            vouchers[
+                existingIndex
+            ] = {
+
+                ...vouchers[
+                    existingIndex
+                ],
+
+                ...voucher
+
+            };
+
+        }
+
+        else {
+
+            vouchers.push(
+                voucher
+            );
+
+        }
+
+
+        saveAllVouchers(
+            vouchers
+        );
+
+    }
+
+
+    /* =========================================================
+       MANUAL SAVE BUTTON
+    ========================================================= */
+
+    function saveVoucherManually() {
+
+        /*
+            পুরাতন Voucher-এর জন্য
+            Save button Update-এর পরিবর্তে
+            ব্যবহার করা হবে না।
+        */
+
+        if (oldVoucherMode) {
+
+            alert(
+                'পুরাতন বাউচার পরিবর্তন করতে এডিট ও আপডেট ব্যবহার করুন।'
+            );
+
+            return;
+
+        }
+
+
+        const voucher =
+            getCurrentVoucherData();
+
+
+        if (!voucher.voucherNo) {
+
+            alert(
+                'ভাউচার নম্বর পাওয়া যায়নি।'
+            );
+
+            return;
+
+        }
+
+
+        if (!voucher.date) {
+
+            alert(
+                'অনুগ্রহ করে ভাউচারের তারিখ নির্বাচন করুন।'
+            );
+
+            return;
+
+        }
+
+
+        if (!voucher.expenses.length) {
+
+            alert(
+                'অনুগ্রহ করে কমপক্ষে একটি খরচের বিবরণ ও টাকার পরিমাণ দিন।'
+            );
+
+            return;
+
+        }
+
+
+        const hasValidAmount =
+            voucher.expenses.some(
+                expense =>
+                    Number(expense.amount) > 0
+            );
+
+
+        if (!hasValidAmount) {
+
+            alert(
+                'অনুগ্রহ করে টাকার পরিমাণ দিন।'
+            );
+
+            return;
+
+        }
+
+
+        saveCurrentVoucher();
+
+
+        alert(
+            'বাউচার সফলভাবে সেভ হয়েছে।'
+        );
+
+
+        /*
+            Alert-এর OK চাপার পর
+            Cash Count-এ ফিরে যাবে।
+        */
+
+        goBackToCashCount();
+
+    }
+
+
+    /* =========================================================
+       ESCAPE HTML
+    ========================================================= */
+
+    function escapeVoucherHTML(value) {
+
+        return String(value)
+            .replace(
+                /&/g,
+                '&amp;'
+            )
+            .replace(
+                /</g,
+                '&lt;'
+            )
+            .replace(
+                />/g,
+                '&gt;'
+            )
+            .replace(
+                /"/g,
+                '&quot;'
+            )
+            .replace(
+                /'/g,
+                '&#039;'
+            );
+
+    }
+
+
+    /* =========================================================
+       LOAD OLD VOUCHER
+    ========================================================= */
+
+    function loadOldVoucher(voucher) {
+
+        oldVoucherMode = true;
+
+        voucherUpdateMode = false;
+
+        editingVoucherNumber =
+            voucher.voucherNo;
+
+
+        const voucherNo =
+            document.getElementById(
+                'voucherNo'
+            );
+
+        const voucherDate =
+            document.getElementById(
+                'voucherDate'
+            );
+
+        const voucherSession =
+            document.getElementById(
+                'voucherSession'
+            );
+
+
+        if (voucherNo) {
+
+            voucherNo.value =
+                voucher.voucherNo;
+
+        }
+
+
+        if (voucherDate) {
+
+            voucherDate.value =
+                voucher.date;
+
+            voucherDate.disabled =
+                true;
+
+        }
+
+
+        if (voucherSession) {
+
+            voucherSession.textContent =
+                voucher.session;
+
+        }
+
+
+        /* REMOVE EXISTING ROWS */
+
+        const tbody =
+            document.getElementById(
+                'expenseBody'
+            );
+
+        const totalRow =
+            document.getElementById(
+                'totalRow'
+            );
+
+
+        if (
+            tbody &&
+            totalRow
+        ) {
+
+            tbody.querySelectorAll(
+                '.expense-row'
+            ).forEach(row => {
+
+                row.remove();
+
+            });
+
+
+            const expenses =
+                Array.isArray(
+                    voucher.expenses
+                )
+                    ? voucher.expenses
+                    : [];
+
+
+            /*
+                যদি কোনো কারণে পুরাতন Voucher-এ
+                expense না থাকে, একটি blank row রাখা হবে।
+            */
+
+            if (!expenses.length) {
+
+                const row =
+                    document.createElement(
+                        'tr'
+                    );
+
+                row.className =
+                    'expense-row';
+
+                row.innerHTML = `
+
+                    <td class="serial-cell">
+                        1
+                    </td>
+
+                    <td>
+
+                        <input
+                            type="text"
+                            class="expense-input description-input"
+                            value=""
+                            readonly
+                        >
+
+                    </td>
+
+                    <td>
+
+                        <input
+                            type="number"
+                            class="expense-input amount-input"
+                            min="0"
+                            step="0.01"
+                            value="0"
+                            readonly
+                        >
+
+                    </td>
+
+                `;
+
+                tbody.insertBefore(
+                    row,
+                    totalRow
+                );
+
+                attachRowEvents(
+                    row
+                );
+
+            }
+
+
+            expenses.forEach(
+                (expense, index) => {
+
+                    const row =
+                        document.createElement(
+                            'tr'
+                        );
+
+                    row.className =
+                        'expense-row';
+
+
+                    row.innerHTML = `
+
+                        <td class="serial-cell">
+                            ${index + 1}
+                        </td>
+
+                        <td>
+
+                            <input
+                                type="text"
+                                class="expense-input description-input"
+                                value="${escapeVoucherHTML(
+                                    expense.description || ''
+                                )}"
+                                readonly
+                            >
+
+                        </td>
+
+                        <td>
+
+                            <input
+                                type="number"
+                                class="expense-input amount-input"
+                                min="0"
+                                step="0.01"
+                                value="${expense.amount || 0}"
+                                readonly
+                            >
+
+                        </td>
+
+                    `;
+
+
+                    tbody.insertBefore(
+                        row,
+                        totalRow
+                    );
+
+
+                    attachRowEvents(
+                        row
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =====================================================
+           SIGNATURES
+        ===================================================== */
+
+        populateVoucherSignatureDropdowns();
+
+
+        const collectorSelect =
+            document.getElementById(
+                'voucherCollectorSelect'
+            );
+
+        const headSelect =
+            document.getElementById(
+                'voucherHeadSelect'
+            );
+
+
+        if (
+            collectorSelect &&
+            voucher.collectorId
+        ) {
+
+            collectorSelect.value =
+                voucher.collectorId;
+
+            applyVoucherSignature(
+                'collector'
+            );
+
+        }
+
+
+        if (
+            headSelect &&
+            voucher.headTeacherId
+        ) {
+
+            headSelect.value =
+                voucher.headTeacherId;
+
+            applyVoucherSignature(
+                'head'
+            );
+
+        }
+
+
+        updateTotal();
+
+
+        /* =====================================================
+           EDIT BUTTON
+        ===================================================== */
+
+        const editBtn =
+            document.getElementById(
+                'voucherEditBtn'
+            );
+
+        const updateBtn =
+            document.getElementById(
+                'voucherUpdateBtn'
+            );
+
+        const saveBtn =
+            document.getElementById(
+                'voucherSaveBtn'
+            );
+
+
+        if (editBtn) {
+
+            editBtn.classList.remove(
+                'hidden'
+            );
+
+        }
+
+
+        if (updateBtn) {
+
+            updateBtn.classList.add(
+                'hidden'
+            );
+
+        }
+
+
+        if (saveBtn) {
+
+            saveBtn.classList.add(
+                'hidden'
+            );
+
+        }
+
+
+        /* LOCK SIGNATURE CONTROLS */
+
+        const collectorControls =
+            document.getElementById(
+                'voucherCollectorControls'
+            );
+
+        const headControls =
+            document.getElementById(
+                'voucherHeadControls'
+            );
+
+
+        if (collectorControls) {
+
+            collectorControls.classList.add(
+                'hidden'
+            );
+
+        }
+
+
+        if (headControls) {
+
+            headControls.classList.add(
+                'hidden'
+            );
+
+        }
+
+    }
+
+
+    /* =========================================================
+       EDIT OLD VOUCHER
+    ========================================================= */
+
+    function editOldVoucher() {
+
+        if (!oldVoucherMode) {
+
+            alert(
+                'এটি পুরাতন বাউচার নয়।'
+            );
+
+            return;
+
+        }
+
+
+        voucherUpdateMode = true;
+
+
+        /*
+            শুধু Amount editable হবে।
+            Description readonly থাকবে।
+            Date disabled থাকবে।
+            Voucher No readonly থাকবে।
+        */
+
+        const amountInputs =
+            document.querySelectorAll(
+                '.amount-input'
+            );
+
+
+        amountInputs.forEach(input => {
+
+            input.removeAttribute(
+                'readonly'
+            );
+
+            input.disabled = false;
+
+        });
+
+
+        const voucherDate =
+            document.getElementById(
+                'voucherDate'
+            );
+
+
+        if (voucherDate) {
+
+            voucherDate.disabled =
+                true;
+
+        }
+
+
+        const editBtn =
+            document.getElementById(
+                'voucherEditBtn'
+            );
+
+        const updateBtn =
+            document.getElementById(
+                'voucherUpdateBtn'
+            );
+
+
+        if (editBtn) {
+
+            editBtn.classList.add(
+                'hidden'
+            );
+
+        }
+
+
+        if (updateBtn) {
+
+            updateBtn.classList.remove(
+                'hidden'
+            );
+
+        }
+
+
+        if (amountInputs.length) {
+
+            amountInputs[0].focus();
+
+        }
+
+    }
+
+
+    /* =========================================================
+       UPDATE OLD VOUCHER
+    ========================================================= */
+
+    function updateOldVoucher() {
+
+        if (
+            !oldVoucherMode ||
+            !editingVoucherNumber
+        ) {
+
+            return;
+
+        }
+
+
+        if (!voucherUpdateMode) {
+
+            return;
+
+        }
+
+
+        const vouchers =
+            getSavedVouchers();
+
+
+        const index =
+            vouchers.findIndex(
+                voucher =>
+                    voucher.voucherNo ===
+                    editingVoucherNumber
+            );
+
+
+        if (index === -1) {
+
+            alert(
+                'পুরাতন বাউচারটি পাওয়া যায়নি।'
+            );
+
+            return;
+
+        }
+
+
+        const current =
+            getCurrentVoucherData();
+
+
+        /*
+            Update-এর সময় শুধুমাত্র
+            expenses/amount related data
+            পরিবর্তন হবে।
+        */
+
+        vouchers[index].expenses =
+            current.expenses;
+
+        vouchers[index].total =
+            current.total;
+
+        vouchers[index].totalBangla =
+            current.totalBangla;
+
+        vouchers[index].amountWords =
+            current.amountWords;
+
+
+        saveAllVouchers(
+            vouchers
+        );
+
+
+        /* LOCK AMOUNTS AGAIN */
+
+        document
+            .querySelectorAll(
+                '.amount-input'
+            )
+            .forEach(input => {
+
+                input.setAttribute(
+                    'readonly',
+                    true
+                );
+
+            });
+
+
+        voucherUpdateMode = false;
+
+
+        const editBtn =
+            document.getElementById(
+                'voucherEditBtn'
+            );
+
+        const updateBtn =
+            document.getElementById(
+                'voucherUpdateBtn'
+            );
+
+
+        if (editBtn) {
+
+            editBtn.classList.remove(
+                'hidden'
+            );
+
+        }
+
+
+        if (updateBtn) {
+
+            updateBtn.classList.add(
+                'hidden'
+            );
+
+        }
+
+
+        updateTotal();
+
+
+        alert(
+            'বাউচার সফলভাবে আপডেট হয়েছে।'
+        );
+
+    }
+
+
+    /* =========================================================
+       BACK TO CASH COUNT
+    ========================================================= */
+
+    function goBackToCashCount() {
+
+        localStorage.removeItem(
+            'LS_OPEN_OLD_VOUCHER'
+        );
+
+        /*
+            Dashboard-এর Cash Count section
+            সরাসরি খোলার জন্য flag রাখা হলো।
+        */
+
+        localStorage.setItem(
+            'LS_OPEN_CASH_COUNT',
+            '1'
+        );
+
+        window.location.href =
+            'dashboard.html';
+
+    }
+
+
+    /* =========================================================
+       OPEN OLD VOUCHER
+    ========================================================= */
+
+    function checkForOldVoucher() {
+
+        const raw =
+            localStorage.getItem(
+                'LS_OPEN_OLD_VOUCHER'
+            );
+
+
+        if (!raw) {
+
+            return false;
+
+        }
+
+
+        try {
+
+            const voucher =
+                JSON.parse(raw);
+
+
+            if (!voucher) {
+
+                return false;
+
+            }
+
+
+            localStorage.removeItem(
+                'LS_OPEN_OLD_VOUCHER'
+            );
+
+
+            loadOldVoucher(
+                voucher
+            );
+
+
+            return true;
+
+        }
+
+        catch (error) {
+
+            console.error(
+                'Old voucher loading error:',
+                error
+            );
+
+            return false;
+
+        }
+
+    }
+
+
+    /* =========================================================
+       PRINT
+    ========================================================= */
+
+    function printVoucher() {
+
+        window.print();
+
+    }
+
+
+    /* =========================================================
+       PDF
+    ========================================================= */
+
+    async function downloadVoucherPDF() {
+
+    const voucher =
+        document.getElementById(
+            'voucher'
+        );
+
+    if (!voucher) return;
+
+    if (
+        typeof html2pdf === 'undefined'
+    ) {
+
+        alert(
+            'PDF সিস্টেম লোড হয়নি। ইন্টারনেট সংযোগ পরীক্ষা করুন।'
+        );
+
+        return;
+    }
+
+    const voucherNumber =
+        document.getElementById(
+            'voucherNo'
+        )?.value
+        || 'Voucher';
+
+    const pdfContainer =
+        document.createElement('div');
+
+    pdfContainer.style.position = 'fixed';
+    pdfContainer.style.left = '0';
+    pdfContainer.style.top = '0';
+    pdfContainer.style.width = '794px';
+    pdfContainer.style.background = '#ffffff';
+    pdfContainer.style.color = '#111827';
+    pdfContainer.style.zIndex = '2147483647';
+    pdfContainer.style.padding = '0';
+    pdfContainer.style.margin = '0';
+
+    const clone =
+        voucher.cloneNode(true);
+
+    clone.style.display = 'block';
+    clone.style.width = '100%';
+    clone.style.margin = '0';
+    clone.style.background = '#ffffff';
+
+    clone
+        .querySelectorAll('.no-print')
+        .forEach(element => {
+
+            element.remove();
+
+        });
+
+    clone
+        .querySelectorAll('button')
+        .forEach(button => {
+
+            button.remove();
+
+        });
+
+    clone
+        .querySelectorAll('tr')
+        .forEach(row => {
+
+            row.style.breakInside =
+                'avoid';
+
+            row.style.pageBreakInside =
+                'avoid';
+
+        });
+
+    clone
+        .querySelectorAll('.sticky')
+        .forEach(element => {
+
+            element.style.position =
+                'static';
+
+        });
+
+    pdfContainer.appendChild(
+        clone
+    );
+
+    document.body.appendChild(
+        pdfContainer
+    );
+
+    const options = {
+
+        margin: 8,
+
+        filename:
+            `${voucherNumber}.pdf`,
+
+        image: {
+
+            type: 'jpeg',
+
+            quality: 0.98
+
+        },
+
+        html2canvas: {
+
+            scale: 2,
+
+            useCORS: true,
+
+            backgroundColor:
+                '#ffffff',
+
+            scrollX: 0,
+
+            scrollY: 0,
+
+            windowWidth: 794
+
+        },
+
+        jsPDF: {
+
+            unit: 'mm',
+
+            format: 'a4',
+
+            orientation: 'portrait'
+
+        },
+
+        pagebreak: {
+
+            mode: [
+                'css',
+                'legacy'
+            ],
+
+            avoid: [
+                'tr'
+            ]
+
+        }
+
+    };
+
+    try {
+
+        await html2pdf()
+            .set(options)
+            .from(pdfContainer)
+            .save();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            'Voucher PDF Error:',
+            error
+        );
+
+        alert(
+            'Voucher PDF তৈরি করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।'
+        );
+
+    }
+
+    finally {
+
+        if (
+            document.body.contains(
+                pdfContainer
+            )
+        ) {
+
+            document.body.removeChild(
+                pdfContainer
+            );
+
+        }
+
+    }
+
+}
+
+    /* =========================================================
+       WHATSAPP SHARE
+    ========================================================= */
+
+    function shareVoucherWhatsApp() {
+
+        const voucherNumber =
+            document.getElementById(
+                'voucherNo'
+            ).value;
+
+
+        const voucherDate =
+            document.getElementById(
+                'voucherDate'
+            ).value;
+
+
+        const session =
+            document.getElementById(
+                'voucherSession'
+            ).textContent;
+
+
+        const total =
+            document.getElementById(
+                'totalAmount'
+            ).textContent;
+
+
+        const message =
+
+            `লার্নিং স্কুল\n` +
+
+            `প্রতিষ্ঠানের পেমেন্ট ভাউচার\n\n` +
+
+            `ভাউচার নং: ${voucherNumber}\n` +
+
+            `তারিখ: ${voucherDate}\n` +
+
+            `সেশন: ${session}\n` +
+
+            `সর্বমোট: ${total} টাকা`;
+
+
+        const whatsappUrl =
+
+            `https://wa.me/?text=` +
+
+            encodeURIComponent(
+                message
+            );
+
+
+        window.open(
+            whatsappUrl,
+            '_blank'
+        );
+
+    }
+
+
+    /* =========================================================
+       DATE CHANGE
+    ========================================================= */
+
+    function attachDateSaveEvent() {
+
+        const dateInput =
+            document.getElementById(
+                'voucherDate'
+            );
+
+
+        if (!dateInput) {
+
+            return;
+
+        }
+
+
+        dateInput.addEventListener(
+            'change',
+            function() {
+
+                /*
+                    পুরাতন Voucher-এর Date
+                    disabled থাকবে।
+                */
+
+                if (oldVoucherMode) {
+
+                    return;
+
+                }
+
+
+                saveCurrentVoucher();
+
+            }
+        );
+
+    }
+
+
+    /* =========================================================
+       INITIALIZE
+    ========================================================= */
+
+    document.addEventListener(
+        'DOMContentLoaded',
+        function() {
+
+            const dateInput =
+                document.getElementById(
+                    'voucherDate'
+                );
+
+
+            const sessionElement =
+                document.getElementById(
+                    'voucherSession'
+                );
+
+
+            const oldVoucherRaw =
+                localStorage.getItem(
+                    'LS_OPEN_OLD_VOUCHER'
+                );
+
+
+            /*
+                Signature dropdown আগে populate
+                করা হবে।
+            */
+
+            populateVoucherSignatureDropdowns();
+
+
+            /*
+                যদি Dashboard থেকে পুরাতন Voucher
+                পাঠানো হয়ে থাকে, তাহলে নতুন A number
+                generate করা হবে না।
+            */
+
+            if (oldVoucherRaw) {
+
+                checkForOldVoucher();
+
+            }
+
+            else {
+
+                /*
+                    NEW VOUCHER
+                */
+
+                if (dateInput) {
+
+                    dateInput.value =
+                        getTodayForInput();
+
+                }
+
+
+                if (sessionElement) {
+
+                    sessionElement.textContent =
+                        getCurrentVoucherSession();
+
+                }
+
+
+                generateNextVoucherNumber();
+
+
+                const firstRow =
+                    document.querySelector(
+                        '.expense-row'
+                    );
+
+
+                if (firstRow) {
+
+                    attachRowEvents(
+                        firstRow
+                    );
+
+                }
+
+
+                attachDateSaveEvent();
+
+
+                updateTotal();
+
+            }
+
+        }
+    );
+
+</script>
+
+</body>
+</html>

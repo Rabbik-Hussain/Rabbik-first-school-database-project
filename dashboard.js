@@ -74,6 +74,647 @@ function loadSessionData(sessionYear) {
     saveAndSyncData();
 }
 
+// =====================================================
+// TODAY'S ACCOUNT — RECEIPT DAILY DATA
+// =====================================================
+
+// =====================================================
+// TODAY'S ACCOUNT — RECEIPT DAILY DATA
+// FULL MONTH VIEW
+// =====================================================
+
+function buildTodayAccountTable() {
+
+    const tableBody =
+        document.getElementById('todayAccountTableBody');
+
+    if (!tableBody) return;
+
+    const classes = [
+        'প্লে',
+        'নার্সারি',
+        'ওয়ান',
+        'টু',
+        'থ্রি',
+        'ফোর',
+        'ফাইভ'
+    ];
+
+    // -------------------------------------------------
+    // Current session-এর Receipt
+    // -------------------------------------------------
+    const sessionReceipts = savedReceipts.filter(receipt =>
+        String(receipt.session) === String(currentSession)
+    );
+
+
+    // =====================================================
+// TODAY'S ACCOUNT — SAVED VOUCHER DATA
+// =====================================================
+
+const savedVouchers =
+    JSON.parse(
+        localStorage.getItem('LS_SAVED_VOUCHERS')
+    ) || [];
+
+    console.log('SAVED VOUCHERS:', savedVouchers);
+    console.log('CURRENT SESSION:', currentSession);
+
+const voucherDailyData = {};
+
+function normalizeSessionYear(value) {
+
+    const banglaDigits = {
+        '০': '0',
+        '১': '1',
+        '২': '2',
+        '৩': '3',
+        '৪': '4',
+        '৫': '5',
+        '৬': '6',
+        '৭': '7',
+        '৮': '8',
+        '৯': '9'
+    };
+
+    return String(value || '')
+        .replace(/[০-৯]/g, digit => banglaDigits[digit])
+        .match(/\d{4}/)?.[0] || '';
+}
+
+const currentSessionYear =
+    normalizeSessionYear(currentSession);
+
+savedVouchers.forEach(voucher => {
+
+    const voucherSession =
+        normalizeSessionYear(voucher.session);
+
+    const voucherDate =
+        String(voucher.date || '').trim();
+
+    const voucherAmount =
+        Number(voucher.total) || 0;
+
+    if (
+        voucherSession !== currentSessionYear ||
+        !voucherDate ||
+        voucherAmount <= 0
+    ) {
+        return;
+    }
+
+    if (!voucherDailyData[voucherDate]) {
+        voucherDailyData[voucherDate] = 0;
+    }
+
+    voucherDailyData[voucherDate] += voucherAmount;
+});
+
+    // -------------------------------------------------
+    // Receipt data:
+    // Date → Class → Amount
+    // -------------------------------------------------
+    const dailyData = {};
+
+    sessionReceipts.forEach(receipt => {
+
+        const date =
+            String(receipt.date || '').trim();
+
+        const className =
+            String(receipt.className || '').trim();
+
+        const amount =
+            Number(receipt.total) || 0;
+
+        if (!date || !classes.includes(className)) {
+            return;
+        }
+
+        if (!dailyData[date]) {
+
+            dailyData[date] = {};
+
+            classes.forEach(classItem => {
+                dailyData[date][classItem] = 0;
+            });
+        }
+
+        dailyData[date][className] += amount;
+    });
+
+    // -------------------------------------------------
+    // Current date / month
+    // -------------------------------------------------
+    const now = new Date();
+
+    const selectedDateInput =
+        document.getElementById('todayAccountSearchDate');
+
+    let referenceDate = now;
+
+    if (selectedDateInput && selectedDateInput.value) {
+
+        const tempDate =
+            new Date(`${selectedDateInput.value}T00:00:00`);
+
+        if (!isNaN(tempDate.getTime())) {
+            referenceDate = tempDate;
+        }
+    }
+
+    const year =
+        referenceDate.getFullYear();
+
+    const month =
+        referenceDate.getMonth();
+
+    // -------------------------------------------------
+    // Month title
+    // -------------------------------------------------
+    const banglaMonths = [
+        'জানুয়ারি',
+        'ফেব্রুয়ারি',
+        'মার্চ',
+        'এপ্রিল',
+        'মে',
+        'জুন',
+        'জুলাই',
+        'আগস্ট',
+        'সেপ্টেম্বর',
+        'অক্টোবর',
+        'নভেম্বর',
+        'ডিসেম্বর'
+    ];
+
+    const monthTitle =
+        document.getElementById('todayAccountMonthTitle');
+
+    if (monthTitle) {
+
+        monthTitle.textContent =
+            `${banglaMonths[month]} ${year}`;
+    }
+
+    // -------------------------------------------------
+    // Number converter
+    // -------------------------------------------------
+    function toBanglaNumber(value) {
+
+        const map = {
+            '0': '০',
+            '1': '১',
+            '2': '২',
+            '3': '৩',
+            '4': '৪',
+            '5': '৫',
+            '6': '৬',
+            '7': '৭',
+            '8': '৮',
+            '9': '৯'
+        };
+
+        return String(value).replace(
+            /[0-9]/g,
+            digit => map[digit]
+        );
+    }
+
+    // -------------------------------------------------
+    // Bangla weekdays
+    // -------------------------------------------------
+    const banglaDays = [
+        'রবিবার',
+        'সোমবার',
+        'মঙ্গলবার',
+        'বুধবার',
+        'বৃহস্পতিবার',
+        'শুক্রবার',
+        'শনিবার'
+    ];
+
+    // -------------------------------------------------
+    // Number of days in current month
+    // -------------------------------------------------
+    const daysInMonth =
+        new Date(year, month + 1, 0).getDate();
+
+    let rowsHtml = '';
+
+    // -------------------------------------------------
+    // Generate every day
+    // -------------------------------------------------
+    for (let day = 1; day <= daysInMonth; day++) {
+
+        const dayString =
+            String(day).padStart(2, '0');
+
+        const monthString =
+            String(month + 1).padStart(2, '0');
+
+        const dateKey =
+            `${year}-${monthString}-${dayString}`;
+
+        const dateObj =
+            new Date(`${dateKey}T00:00:00`);
+
+        const dayName =
+            banglaDays[dateObj.getDay()];
+
+        // ---------------------------------------------
+        // Class amounts
+        // ---------------------------------------------
+        const classData =
+            dailyData[dateKey] || {};
+
+        const voucherAmount =
+             Number(voucherDailyData[dateKey]) || 0;
+
+        let totalAmount = 0;
+
+        classes.forEach(className => {
+
+            totalAmount +=
+                Number(classData[className]) || 0;
+        });
+
+        // ---------------------------------------------
+        // Class cells
+        // ---------------------------------------------
+        const classCells =
+            classes.map(className => {
+
+                const amount =
+                    Number(classData[className]) || 0;
+
+                return `
+                    <td
+                        class="border border-gray-200 px-3 py-3 text-center font-bold text-gray-800"
+                    >
+                        ${
+                            amount > 0
+                                ? toBanglaNumber(amount) + '/-'
+                                : '—'
+                        }
+                    </td>
+                `;
+
+            }).join('');
+
+        // ---------------------------------------------
+        // Complete row
+        // ---------------------------------------------
+        rowsHtml += `
+            <tr
+                data-account-date="${dateKey}"
+                class="hover:bg-gray-50 transition"
+            >
+
+                <td
+                    class="border border-gray-200 px-3 py-3 text-center font-bold sticky left-0 bg-white z-[5]"
+                >
+                    ${toBanglaNumber(dayString)}
+                    -
+                    ${toBanglaNumber(monthString)}
+                    -
+                    ${toBanglaNumber(year)}
+                </td>
+
+                <td
+                    class="border border-gray-200 px-3 py-3 text-center font-semibold sticky left-[82px] bg-white z-[5]"
+                >
+                    ${dayName}
+                </td>
+
+                ${classCells}
+
+                <!-- মোট জমা -->
+                <td
+                    class="border border-gray-200 px-3 py-3 text-center font-black text-emerald-700 bg-emerald-50"
+                >
+                    ${
+                        totalAmount > 0
+                            ? toBanglaNumber(totalAmount) + '/-'
+                            : '—'
+                    }
+                </td>
+
+                <!-- Voucher -->
+                <td
+                    class="border border-gray-200 px-3 py-3 text-center font-bold text-red-700 bg-red-50"
+                >
+                    ${
+                        voucherAmount > 0
+                            ? toBanglaNumber(voucherAmount) + '/-'
+                            : '—'
+                    }
+                </td>
+
+                <!-- Net জমা -->
+                <td
+                    class="border border-gray-200 px-3 py-3 text-center font-black text-indigo-700 bg-indigo-50"
+                >
+                    ${
+                        (totalAmount - voucherAmount) > 0
+                            ? toBanglaNumber(
+                                totalAmount - voucherAmount
+                              ) + '/-'
+                            : '—'
+                    }
+                </td>
+
+            </tr>
+        `;
+    }
+
+    tableBody.innerHTML = rowsHtml;
+
+    applyReceiptEditTrackingToTodayAccount();
+}
+
+// =====================================================
+// TODAY'S ACCOUNT — RECEIPT EDIT TRACKING
+// =====================================================
+
+function applyReceiptEditTrackingToTodayAccount() {
+
+    const tableBody =
+        document.getElementById(
+            'todayAccountTableBody'
+        );
+
+    if (!tableBody) return;
+
+    const banglaClasses = [
+        'প্লে',
+        'নার্সারি',
+        'ওয়ান',
+        'টু',
+        'থ্রি',
+        'ফোর',
+        'ফাইভ'
+    ];
+
+    // -----------------------------------------------
+    // আগের Tracking display থাকলে আগে সরিয়ে দাও
+    // -----------------------------------------------
+    tableBody
+        .querySelectorAll('.receipt-edit-tracking')
+        .forEach(element => element.remove());
+
+    // -----------------------------------------------
+    // Current Session-এর edited receipts
+    // -----------------------------------------------
+    const sessionReceipts =
+        savedReceipts.filter(receipt => {
+
+            const receiptSession =
+                normalizeSessionYear(
+                    receipt.session
+                );
+
+            return (
+                receiptSession ===
+                normalizeSessionYear(currentSession)
+            );
+        });
+
+    // -----------------------------------------------
+    // Date + Class অনুযায়ী Edit Difference জমা
+    // -----------------------------------------------
+    const editTracking = {};
+
+    sessionReceipts.forEach(receipt => {
+
+        if (!receipt.editInfo) return;
+
+        const date =
+            String(receipt.date || '').trim();
+
+        const className =
+            String(receipt.className || '').trim();
+
+        const difference =
+            Number(
+                receipt.editInfo.difference
+            ) || 0;
+
+        const editDate =
+            String(
+                receipt.editInfo.editDate || ''
+            ).trim();
+
+        if (
+            !date ||
+            !banglaClasses.includes(className) ||
+            !editDate ||
+            difference === 0
+        ) {
+            return;
+        }
+
+        if (!editTracking[date]) {
+            editTracking[date] = {};
+        }
+
+        if (!editTracking[date][className]) {
+            editTracking[date][className] = {
+                difference: 0,
+                editDates: []
+            };
+        }
+
+        editTracking[date][className].difference +=
+            difference;
+
+        if (
+            !editTracking[date][className].editDates
+                .includes(editDate)
+        ) {
+            editTracking[date][className].editDates.push(
+                editDate
+            );
+        }
+    });
+
+    // -----------------------------------------------
+    // Table-এর প্রতিটি দিনের Row-তে Tracking দেখাও
+    // -----------------------------------------------
+    tableBody
+        .querySelectorAll('tr[data-account-date]')
+        .forEach(row => {
+
+            const date =
+                row.getAttribute(
+                    'data-account-date'
+                );
+
+            const dateTracking =
+                editTracking[date];
+
+            if (!dateTracking) return;
+
+            const cells =
+                row.querySelectorAll('td');
+
+            banglaClasses.forEach(
+                (className, classIndex) => {
+
+                    const tracking =
+                        dateTracking[className];
+
+                    if (!tracking) return;
+
+                    // Date + Day = প্রথম ২টি column
+                    // তাই class cell শুরু হচ্ছে index 2 থেকে
+                    const cell =
+                        cells[classIndex + 2];
+
+                    if (!cell) return;
+
+                    const difference =
+                        tracking.difference;
+
+                    const sign =
+                        difference > 0
+                            ? '+'
+                            : '';
+
+                    const banglaAmount =
+                        toBanglaNumber(
+                            Math.abs(difference)
+                        );
+
+                    const editDates =
+                        tracking.editDates.join(', ');
+
+                    const trackingElement =
+                        document.createElement('div');
+
+                    trackingElement.className =
+                        'receipt-edit-tracking text-red-600 text-[11px] font-black mt-1 leading-tight';
+
+                    trackingElement.textContent =
+                        `Edit: ${sign}${difference < 0 ? '-' : ''}৳${banglaAmount} | ${editDates}`;
+
+                    cell.appendChild(
+                        trackingElement
+                    );
+                }
+            );
+        });
+}
+
+// =====================================================
+// TODAY'S ACCOUNT — SEARCH BY DATE
+// =====================================================
+
+function searchTodayAccountDate() {
+
+    const dateInput =
+        document.getElementById('todayAccountSearchDate');
+
+    if (!dateInput || !dateInput.value) {
+        alert('অনুগ্রহ করে একটি তারিখ নির্বাচন করুন।');
+        return;
+    }
+
+    const selectedDate =
+        new Date(`${dateInput.value}T00:00:00`);
+
+    if (isNaN(selectedDate.getTime())) {
+        alert('সঠিক তারিখ নির্বাচন করুন।');
+        return;
+    }
+
+    // Current session-ই ব্যবহার হবে
+    const sessionInput =
+        document.getElementById('todayAccountSearchSession');
+
+    if (sessionInput) {
+        sessionInput.value = currentSession;
+    }
+
+    // নির্বাচিত তারিখ অনুযায়ী পুরো মাসের table তৈরি
+    buildTodayAccountTable();
+
+    // Search status
+    const statusElement =
+        document.getElementById('todayAccountSearchStatus');
+
+    if (statusElement) {
+
+        const banglaMonths = [
+            'জানুয়ারি',
+            'ফেব্রুয়ারি',
+            'মার্চ',
+            'এপ্রিল',
+            'মে',
+            'জুন',
+            'জুলাই',
+            'আগস্ট',
+            'সেপ্টেম্বর',
+            'অক্টোবর',
+            'নভেম্বর',
+            'ডিসেম্বর'
+        ];
+
+        const year =
+            selectedDate.getFullYear();
+
+        const month =
+            selectedDate.getMonth();
+
+        const day =
+            selectedDate.getDate();
+
+        const banglaNumber = value => {
+
+            const map = {
+                '0': '০',
+                '1': '১',
+                '2': '২',
+                '3': '৩',
+                '4': '৪',
+                '5': '৫',
+                '6': '৬',
+                '7': '৭',
+                '8': '৮',
+                '9': '৯'
+            };
+
+            return String(value).replace(
+                /[0-9]/g,
+                digit => map[digit]
+            );
+        };
+
+        statusElement.textContent =
+            `নির্বাচিত: ${banglaNumber(day)} ${banglaMonths[month]} ${banglaNumber(year)}`;
+
+        statusElement.classList.remove('hidden');
+    }
+
+    // নির্বাচিত দিনের row খুঁজে বের করা
+    const targetRow =
+        document.querySelector(
+            `tr[data-account-date="${dateInput.value}"]`
+        );
+
+    if (targetRow) {
+
+        targetRow.classList.add(
+            'bg-yellow-100'
+        );
+
+        targetRow.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+        });
+    }
+}
+
 function switchSession() {
     const val = document.getElementById('inputSearchSession').value.trim();
     if(!val) {
@@ -149,6 +790,10 @@ const languageTranslations = {
         homePortalTitle: 'লার্নিং স্কুল ডিজিটাল পোর্টাল',
         homePortalDescription: 'সকল প্রকার মাসিক ফি, রসিদ প্রদান ও বকেয়া হিসাব নিয়ন্ত্রণের জন্য "ক্যাশ কাউন্ট" বাটনে চাপ দিন।',
         goToAccounts: 'হিসাব সেকশনে যান',
+        todayAccountTitle: '📊 আজকের হিসাব',
+        todayAccountDescription: 'প্রতিদিনের শ্রেণিভিত্তিক জমা, প্রতিষ্ঠানের খরচ এবং অবশিষ্ট হিসাব দেখুন।',
+        findAccountMonth: '🔍 হিসাবের মাসটি খুঁজুন',
+        viewTodayAccount: '📊 আজকের হিসাব দেখুন',
 
         sessionSelectChange: '🔍 সেশন নির্বাচন / পরিবর্তন',
         sessionSelectDescription: 'পুরাতন বা সংরক্ষিত কোনো সেশনের ডাটা দেখতে এখানে সাল লিখুন।',
@@ -180,8 +825,12 @@ const languageTranslations = {
 
         monthlyBillTitle: 'প্রতি মাসের হিসাব দিন (বকেয়া বিল)',
         monthlyBillDescription: 'মাসের শেষে বকেয়া তালিকা তৈরি করে প্রিন্ট বা হোয়াটসঅ্যাপে শেয়ার করুন।',
-        giveMonthlyAccount: 'প্রত্যেকের মাসের হিসাব দিন'
-    },
+        giveMonthlyAccount: 'প্রত্যেকের মাসের হিসাব দিন',
+        searchOldVoucher: '🔍 পুরাতন বাউচার খুঁজুন',
+        institutionPaymentVoucher: 'প্রতিষ্ঠানের পেমেন্ট ভাউচার',
+        institutionPaymentVoucherDescription: 'প্রতিষ্ঠানের বিভিন্ন অর্থ প্রদান ও খরচের জন্য পেমেন্ট ভাউচার তৈরি করুন।',
+        createVoucherButton: '🧾 ভাউচার তৈরি করুন',
+            },
 
     en: {
         languageButton: 'বাংলা',
@@ -197,6 +846,10 @@ const languageTranslations = {
         homePortalTitle: 'Learning School Digital Portal',
         homePortalDescription: 'Click the "Cash Count" button to manage monthly fees, issue receipts, and control outstanding balances.',
         goToAccounts: 'Go to Accounts',
+        todayAccountTitle: '📊 Today\'s Account',
+        todayAccountDescription: 'View daily class-wise collections, institutional expenses, and remaining balance.',
+        findAccountMonth: '🔍 Find Account Month',
+        viewTodayAccount: '📊 View Today\'s Account',
 
         sessionSelectChange: '🔍 Select / Change Session',
         sessionSelectDescription: 'Enter a year here to view data from an old or saved session.',
@@ -228,7 +881,11 @@ const languageTranslations = {
 
         monthlyBillTitle: 'Monthly Account (Outstanding Bill)',
         monthlyBillDescription: 'Create the outstanding list at the end of the month and print or share it on WhatsApp.',
-        giveMonthlyAccount: 'Give Monthly Account'
+        giveMonthlyAccount: 'Give Monthly Account',
+        searchOldVoucher: '🔍 Search Old Vouchers',
+        institutionPaymentVoucher: 'Institution Payment Voucher',
+        institutionPaymentVoucherDescription: 'Create payment vouchers for various institutional payments and expenses.',
+        createVoucherButton: '🧾 Create Voucher',
     }
 };
 
@@ -396,24 +1053,620 @@ document.addEventListener(
 
 
 function showSection(secId) {
-    ['home', 'info', 'dashboard', 'classtable', 'receiptform', 'receiptpreview', 'monthlybill', 'billpreview'].forEach(s => {
+    [
+        'home',
+        'info',
+        'dashboard',
+        'classtable',
+        'receiptform',
+        'receiptpreview',
+        'monthlybill',
+        'billpreview'
+    ].forEach(s => {
         const el = document.getElementById('sec-' + s);
-        if(el) el.classList.add('hidden');
+        if (el) el.classList.add('hidden');
     });
 
-    const targetEl = document.getElementById('sec-' + secId);
-    if(targetEl) targetEl.classList.remove('hidden');
+    // Hide Today's Account internal view when changing main sections
+    const todayAccountView = document.getElementById('todayAccountView');
+    if (todayAccountView) {
+        todayAccountView.classList.add('hidden');
+    }
 
-    if(secId === 'home') {
+    const targetEl = document.getElementById('sec-' + secId);
+    if (targetEl) targetEl.classList.remove('hidden');
+
+    if (secId === 'home') {
         loadClassFeeConfig();
-    } else if(secId === 'info') {
+    } else if (secId === 'info') {
         renderInformationTeachers();
-    } else if(secId === 'receiptpreview') {
+    } else if (secId === 'receiptpreview') {
         populateReceiptSignatureDropdowns();
-    } else if(secId === 'billpreview') {
+    } else if (secId === 'billpreview') {
         populateBillHeadTeacherDropdown();
     }
 }
+
+
+// ===============================
+// TODAY'S ACCOUNT — OPEN / CLOSE
+// ===============================
+
+function openTodayAccount() {
+    const homeSection = document.getElementById('sec-home');
+    const todayAccountView = document.getElementById('todayAccountView');
+
+    if (!homeSection || !todayAccountView) return;
+
+    // Make sure Home section is visible
+    homeSection.classList.remove('hidden');
+
+    // Hide normal Home content
+    document.querySelectorAll('#sec-home > *:not(#todayAccountView)').forEach(element => {
+        element.classList.add('hidden');
+    });
+
+    // Show Today's Account report
+    todayAccountView.classList.remove('hidden');
+
+    // Load current session
+    const sessionElement = document.getElementById('todayAccountSession');
+    const searchSessionElement = document.getElementById('todayAccountSearchSession');
+
+    if (sessionElement) {
+        sessionElement.textContent = currentSession;
+    }
+
+    if (searchSessionElement) {
+        searchSessionElement.value = currentSession;
+    }
+
+    // Clear previous search status
+    const statusElement = document.getElementById('todayAccountSearchStatus');
+
+    if (statusElement) {
+        statusElement.textContent = '';
+        statusElement.classList.add('hidden');
+    }
+
+    // Start with current date
+    const dateInput = document.getElementById('todayAccountSearchDate');
+
+    if (dateInput && !dateInput.value) {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+
+        dateInput.value = `${year}-${month}-${day}`;
+    }
+
+    // Temporary empty table.
+    // Actual database calculation will be added in the next step.
+    const tableBody = document.getElementById('todayAccountTableBody');
+
+    if (tableBody) {
+        tableBody.innerHTML = `
+            <tr>
+                <td
+                    colspan="12"
+                    class="border px-4 py-8 text-center text-gray-500 font-semibold"
+                >
+                    আজকের হিসাবের ডাটা লোড হচ্ছে...
+                </td>
+            </tr>
+        `;
+    }
+
+    buildTodayAccountTable();
+}
+
+
+function closeTodayAccount() {
+    const homeSection = document.getElementById('sec-home');
+    const todayAccountView = document.getElementById('todayAccountView');
+
+    if (!homeSection || !todayAccountView) return;
+
+    // Hide report
+    todayAccountView.classList.add('hidden');
+
+    // Show normal Home content again
+    document.querySelectorAll('#sec-home > *:not(#todayAccountView)').forEach(element => {
+        element.classList.remove('hidden');
+    });
+}
+
+// =====================================================
+// TODAY'S ACCOUNT — PRINT
+// =====================================================
+
+function printTodayAccount() {
+
+    const report =
+        document.getElementById('todayAccountView');
+
+    if (!report) {
+        alert('আজকের হিসাব রিপোর্ট পাওয়া যায়নি!');
+        return;
+    }
+
+    const printWindow =
+        window.open('', '_blank');
+
+    if (!printWindow) {
+        alert('Print window খোলা যাচ্ছে না। Browser popup অনুমতি দিন।');
+        return;
+    }
+
+    const reportClone =
+        report.cloneNode(true);
+
+    // Action buttons বাদ
+    reportClone
+        .querySelectorAll(
+            'button'
+        )
+        .forEach(button => {
+
+            const text =
+                button.innerText.trim();
+
+            if (
+                text.includes('প্রিন্ট') ||
+                text.includes('PDF') ||
+                text.includes('ফিরে যান') ||
+                text.includes('হিসাব খুঁজুন')
+            ) {
+                button.remove();
+            }
+        });
+
+    printWindow.document.open();
+
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="bn">
+        <head>
+            <meta charset="UTF-8">
+
+            <title>আজকের হিসাব রিপোর্ট</title>
+
+            <style>
+
+                @page {
+                    size: A4 landscape;
+                    margin: 10mm;
+                }
+
+                * {
+                    box-sizing: border-box;
+                }
+
+                body {
+                    margin: 0;
+                    padding: 0;
+                    font-family:
+                        Arial,
+                        "Noto Sans Bengali",
+                        sans-serif;
+                    background: white;
+                    color: #111827;
+                }
+
+                #todayAccountView {
+                    display: block !important;
+                    width: 100% !important;
+                }
+
+                table {
+                    width: 100% !important;
+                    min-width: 0 !important;
+                    border-collapse: collapse !important;
+                    font-size: 10px !important;
+                }
+
+                th,
+                td {
+                    border: 1px solid #9ca3af !important;
+                    padding: 5px 4px !important;
+                    text-align: center;
+                    vertical-align: middle;
+                }
+
+                thead {
+                    display: table-header-group;
+                }
+
+                tr {
+                    break-inside: avoid;
+                    page-break-inside: avoid;
+                }
+
+                th {
+                    font-weight: 700;
+                    background: #e5e7eb !important;
+                }
+
+                .sticky {
+                    position: static !important;
+                }
+
+                .receipt-edit-tracking {
+                    color: #dc2626 !important;
+                    font-size: 9px !important;
+                }
+
+                @media print {
+
+                    body {
+                        -webkit-print-color-adjust: exact;
+                        print-color-adjust: exact;
+                    }
+
+                }
+
+            </style>
+        </head>
+
+        <body>
+
+            ${reportClone.outerHTML}
+
+            <script>
+                window.onload = function () {
+                    setTimeout(function () {
+                        window.print();
+                    }, 500);
+                };
+
+                window.onafterprint = function () {
+                    window.close();
+                };
+            <\/script>
+
+        </body>
+        </html>
+    `);
+
+    printWindow.document.close();
+}
+
+
+function printReceipt() {
+    const receipt = document.getElementById('printableReceipt');
+
+    if (!receipt) {
+        alert('রশীদের প্রিভিউ পাওয়া যায়নি।');
+        return;
+    }
+
+    // Script বাদ দিয়ে শুধু তৈরি হয়ে যাওয়া receipt content নেওয়া হবে
+    const receiptClone = receipt.cloneNode(true);
+
+    receiptClone.querySelectorAll('script').forEach(script => {
+        script.remove();
+    });
+
+    const printWindow = window.open('', '_blank', 'width=900,height=700');
+
+    if (!printWindow) {
+        alert('Print window খোলা যায়নি।');
+        return;
+    }
+
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="bn">
+        <head>
+            <meta charset="UTF-8">
+            <title>রশীদ প্রিন্ট</title>
+
+            <script src="https://cdn.tailwindcss.com"></script>
+
+            <style>
+                body {
+                    margin: 0;
+                    padding: 20px;
+                    background: white;
+                }
+
+                .no-print {
+                    display: none !important;
+                }
+
+                @media print {
+                    body {
+                        padding: 0;
+                    }
+                }
+            </style>
+        </head>
+
+        <body>
+            ${receiptClone.outerHTML}
+
+            <script>
+                window.onload = function () {
+                    setTimeout(function () {
+                        window.print();
+                    }, 500);
+                };
+
+                window.onafterprint = function () {
+                    window.close();
+                };
+            <\/script>
+        </body>
+        </html>
+    `);
+
+    printWindow.document.close();
+}
+
+
+// =====================================================
+// TODAY'S ACCOUNT — PDF
+// =====================================================
+
+function downloadTodayAccountPDF() {
+
+const report =  
+    document.getElementById(  
+        'todayAccountView'  
+    );  
+
+if (!report) {  
+
+    alert(  
+        'আজকের হিসাব রিপোর্ট পাওয়া যায়নি!'  
+    );  
+
+    return;  
+}  
+
+if (  
+    typeof html2pdf === 'undefined'  
+) {  
+
+    alert(  
+        'PDF system পাওয়া যাচ্ছে না। পেজটি আবার Reload করুন।'  
+    );  
+
+    return;  
+}  
+
+const reportClone =  
+    report.cloneNode(true);  
+
+reportClone  
+    .querySelectorAll('button')  
+    .forEach(button => {  
+
+        button.remove();  
+
+    });  
+
+const pdfContainer =  
+    document.createElement('div');  
+
+/*  
+   গুরুত্বপূর্ণ:  
+   আর -100000px ব্যবহার করা হচ্ছে না।  
+   Renderer-এর দৃশ্যমান viewport-এর মধ্যেই  
+   temporary PDF container রাখা হচ্ছে।  
+*/  
+
+pdfContainer.style.position = 'fixed';  
+pdfContainer.style.left = '0';  
+pdfContainer.style.top = '0';  
+pdfContainer.style.width = '1120px';  
+pdfContainer.style.background = '#ffffff';  
+pdfContainer.style.color = '#111827';  
+pdfContainer.style.zIndex = '2147483647';  
+pdfContainer.style.padding = '10px';  
+pdfContainer.style.margin = '0';  
+
+pdfContainer.style.fontFamily =  
+    'Arial, "Noto Sans Bengali", sans-serif';  
+
+reportClone.style.display = 'block';  
+reportClone.style.width = '100%';  
+reportClone.style.minWidth = '0';  
+reportClone.style.background = '#ffffff';  
+
+reportClone  
+    .querySelectorAll('.sticky')  
+    .forEach(element => {  
+
+        element.style.position = 'static';  
+
+    });  
+
+reportClone  
+    .querySelectorAll('table')  
+    .forEach(table => {  
+
+        table.style.width = '100%';  
+        table.style.minWidth = '0';  
+        table.style.borderCollapse =  
+            'collapse';  
+
+    });  
+
+reportClone  
+    .querySelectorAll('th, td')  
+    .forEach(cell => {  
+
+        cell.style.border =  
+            '1px solid #9ca3af';  
+
+        cell.style.padding =  
+            '4px 3px';  
+
+        cell.style.textAlign =  
+            'center';  
+
+        cell.style.verticalAlign =  
+            'middle';  
+
+    });  
+
+reportClone  
+    .querySelectorAll('tr')  
+    .forEach(row => {  
+
+        row.style.breakInside =  
+            'avoid';  
+
+        row.style.pageBreakInside =  
+            'avoid';  
+
+    });  
+
+reportClone  
+    .querySelectorAll(  
+        '.receipt-edit-tracking'  
+    )  
+    .forEach(element => {  
+
+        element.style.color =  
+            '#dc2626';  
+
+        element.style.fontSize =  
+            '8px';  
+
+    });  
+
+pdfContainer.appendChild(  
+    reportClone  
+);  
+
+document.body.appendChild(  
+    pdfContainer  
+);  
+
+const session =  
+    String(  
+        currentSession || 'Session'  
+    ).replace(  
+        /[^\dA-Za-z-]/g,  
+        ''  
+    );  
+
+const monthTitle =  
+    document.getElementById(  
+        'todayAccountMonthTitle'  
+    )?.innerText  
+    ?.trim()  
+    || 'হিসাব';  
+
+const safeMonthTitle =  
+    monthTitle.replace(  
+        /[\\/:*?"<>|]/g,  
+        '-'  
+    );  
+
+const filename =  
+    `Learning-School-Todays-Account-${session}-${safeMonthTitle}.pdf`;  
+
+const opt = {  
+
+    margin: [  
+        8,  
+        8,  
+        8,  
+        8  
+    ],  
+
+    filename: filename,  
+
+    image: {  
+        type: 'jpeg',  
+        quality: 0.98  
+    },  
+
+    html2canvas: {  
+
+        scale: 2,  
+
+        useCORS: true,  
+
+        backgroundColor: '#ffffff',  
+
+        scrollX: 0,  
+
+        scrollY: 0,  
+
+        windowWidth: 1120  
+
+    },  
+
+    jsPDF: {  
+
+        unit: 'mm',  
+
+        format: 'a4',  
+
+        orientation: 'landscape'  
+
+    },  
+
+    pagebreak: {  
+
+        mode: [  
+            'css',  
+            'legacy'  
+        ],  
+
+        avoid: [  
+            'tr'  
+        ]  
+
+    }  
+
+};  
+
+html2pdf()  
+    .set(opt)  
+    .from(pdfContainer)  
+    .save()  
+    .then(() => {  
+
+        document.body.removeChild(  
+            pdfContainer  
+        );  
+
+    })  
+    .catch(error => {  
+
+        console.error(  
+            'Today Account PDF Error:',  
+            error  
+        );  
+
+        if (  
+            document.body.contains(  
+                pdfContainer  
+            )  
+        ) {  
+
+            document.body.removeChild(  
+                pdfContainer  
+            );  
+
+        }  
+
+        alert(  
+            'আজকের হিসাব PDF তৈরি করতে সমস্যা হয়েছে।'  
+        );  
+
+    });
+
+}
+
+
+
 
 // ==========================================
 // 2. REGISTERED TEACHERS DATA HELPER
@@ -2149,29 +3402,62 @@ function updateEditedReceipt() {
         }
 
         // =====================================================
-        // Updated Receipt Save
-        // =====================================================
-        savedReceipts[receiptIdx] = {
-            ...oldReceipt,
+// Updated Receipt Save + Edit Tracking
+// =====================================================
 
-            serial: editingOldReceiptSerial,
-            name: studentName,
+// পুরোনো ও নতুন Receipt-এর মোট টাকার পার্থক্য
+const oldTotalAmount =
+    Number(oldReceipt.total) || 0;
 
-            studentId:
-                studentId && studentId !== '—'
-                    ? studentId
-                    : oldReceipt.studentId || '',
+const receiptEditDifference =
+    totalAmount - oldTotalAmount;
 
-            roll: roll,
-            className: className,
-            date: date,
-            total: totalAmount,
+// বর্তমান Edit-এর তারিখ
+const now = new Date();
 
-            itemsHtml:
-                document.querySelector('.outItemsBody').innerHTML,
+const editDay =
+    String(now.getDate()).padStart(2, '0');
 
-            itemsList: currentGeneratedItems
-        };
+const editMonth =
+    String(now.getMonth() + 1).padStart(2, '0');
+
+const editYear =
+    now.getFullYear();
+
+const receiptEditDate =
+    `${editDay}-${editMonth}-${editYear}`;
+
+savedReceipts[receiptIdx] = {
+    ...oldReceipt,
+
+    serial: editingOldReceiptSerial,
+    name: studentName,
+
+    studentId:
+        studentId && studentId !== '—'
+            ? studentId
+            : oldReceipt.studentId || '',
+
+    roll: roll,
+    className: className,
+    date: date,
+    total: totalAmount,
+
+    itemsHtml:
+        document.querySelector('.outItemsBody').innerHTML,
+
+    itemsList: currentGeneratedItems,
+
+    // =================================================
+    // Receipt Edit Tracking
+    // =================================================
+    editInfo: {
+        oldAmount: oldTotalAmount,
+        newAmount: totalAmount,
+        difference: receiptEditDifference,
+        editDate: receiptEditDate
+    }
+};
 
         saveAndSyncData();
 
@@ -2196,10 +3482,15 @@ function editReceiptForm() {
 // RECEIPT PDF
 // ==========================================
 function downloadReceiptPDF() {
-    const element = document.getElementById('printableReceipt');
-    if(!element) return;
 
-    const controls = element.querySelectorAll('.no-print');
+    const element =
+        document.getElementById('printableReceipt');
+
+    if (!element) return;
+
+    const controls =
+        element.querySelectorAll('.no-print');
+
     const oldDisplays = [];
 
     controls.forEach(control => {
@@ -2207,27 +3498,103 @@ function downloadReceiptPDF() {
         control.style.display = 'none';
     });
 
+    const pdfContainer =
+        document.createElement('div');
+
+    pdfContainer.style.position = 'fixed';
+    pdfContainer.style.left = '0';
+    pdfContainer.style.top = '0';
+    pdfContainer.style.width = '794px';
+    pdfContainer.style.background = '#ffffff';
+    pdfContainer.style.zIndex = '2147483647';
+    pdfContainer.style.padding = '0';
+    pdfContainer.style.margin = '0';
+
+    const clone =
+        element.cloneNode(true);
+
+    clone.style.display = 'block';
+    clone.style.width = '100%';
+    clone.style.margin = '0';
+    clone.style.background = '#ffffff';
+
+    pdfContainer.appendChild(clone);
+    document.body.appendChild(pdfContainer);
+
     const opt = {
-        margin:       0.2,
-        filename:     'Money_Receipt.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
-        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+
+        margin: 8,
+
+        filename: 'Money_Receipt.pdf',
+
+        image: {
+            type: 'jpeg',
+            quality: 0.98
+        },
+
+        html2canvas: {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            scrollX: 0,
+            scrollY: 0
+        },
+
+        jsPDF: {
+            unit: 'mm',
+            format: 'a4',
+            orientation: 'portrait'
+        },
+
+        pagebreak: {
+            mode: ['css', 'legacy'],
+            avoid: ['tr']
+        }
+
     };
 
     html2pdf()
         .set(opt)
-        .from(element)
+        .from(pdfContainer)
         .save()
         .then(() => {
+
+            document.body.removeChild(
+                pdfContainer
+            );
+
             controls.forEach((control, index) => {
-                control.style.display = oldDisplays[index];
+                control.style.display =
+                    oldDisplays[index];
             });
+
         })
-        .catch(() => {
+        .catch(error => {
+
+            console.error(
+                'Receipt PDF Error:',
+                error
+            );
+
+            if (
+                document.body.contains(
+                    pdfContainer
+                )
+            ) {
+                document.body.removeChild(
+                    pdfContainer
+                );
+            }
+
             controls.forEach((control, index) => {
-                control.style.display = oldDisplays[index];
+                control.style.display =
+                    oldDisplays[index];
             });
+
+            alert(
+                'PDF তৈরি করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।'
+            );
+
         });
 }
 
@@ -2468,39 +3835,196 @@ function generateBillPaper(name, className, roll) {
 // MONTHLY BILL PDF
 // ==========================================
 function downloadBillPDF() {
-    const element = document.getElementById('billPaper');
-    if(!element) return;
 
-    const controls = element.querySelectorAll('.no-print');
+    const element =
+        document.getElementById('billPaper');
+
+    if (!element) return;
+
+    if (
+        typeof html2pdf === 'undefined'
+    ) {
+
+        alert(
+            'PDF system পাওয়া যাচ্ছে না। পেজটি আবার Reload করুন।'
+        );
+
+        return;
+    }
+
+    const controls =
+        element.querySelectorAll('.no-print');
+
     const oldDisplays = [];
 
     controls.forEach(control => {
-        oldDisplays.push(control.style.display);
+
+        oldDisplays.push(
+            control.style.display
+        );
+
         control.style.display = 'none';
+
     });
 
+    const pdfContainer =
+        document.createElement('div');
+
+    pdfContainer.style.position = 'fixed';
+    pdfContainer.style.left = '0';
+    pdfContainer.style.top = '0';
+    pdfContainer.style.width = '794px';
+    pdfContainer.style.background = '#ffffff';
+    pdfContainer.style.zIndex = '2147483647';
+    pdfContainer.style.padding = '0';
+    pdfContainer.style.margin = '0';
+
+    const clone =
+        element.cloneNode(true);
+
+    clone.style.display = 'block';
+    clone.style.width = '100%';
+    clone.style.margin = '0';
+    clone.style.background = '#ffffff';
+
+    clone
+        .querySelectorAll('.sticky')
+        .forEach(el => {
+
+            el.style.position = 'static';
+
+        });
+
+    clone
+        .querySelectorAll('tr')
+        .forEach(row => {
+
+            row.style.breakInside =
+                'avoid';
+
+            row.style.pageBreakInside =
+                'avoid';
+
+        });
+
+    pdfContainer.appendChild(
+        clone
+    );
+
+    document.body.appendChild(
+        pdfContainer
+    );
+
     const opt = {
-        margin:       0.5,
-        filename:     'Learning_School_Bill.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
-        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+
+        margin: 8,
+
+        filename:
+            'Learning_School_Bill.pdf',
+
+        image: {
+
+            type: 'jpeg',
+
+            quality: 0.98
+
+        },
+
+        html2canvas: {
+
+            scale: 2,
+
+            useCORS: true,
+
+            backgroundColor: '#ffffff',
+
+            scrollX: 0,
+
+            scrollY: 0,
+
+            windowWidth: 794
+
+        },
+
+        jsPDF: {
+
+            unit: 'mm',
+
+            format: 'a4',
+
+            orientation: 'portrait'
+
+        },
+
+        pagebreak: {
+
+            mode: [
+                'css',
+                'legacy'
+            ],
+
+            avoid: [
+                'tr'
+            ]
+
+        }
+
     };
 
     html2pdf()
         .set(opt)
-        .from(element)
+        .from(pdfContainer)
         .save()
         .then(() => {
-            controls.forEach((control, index) => {
-                control.style.display = oldDisplays[index];
-            });
+
+            document.body.removeChild(
+                pdfContainer
+            );
+
+            controls.forEach(
+                (control, index) => {
+
+                    control.style.display =
+                        oldDisplays[index];
+
+                }
+            );
+
         })
-        .catch(() => {
-            controls.forEach((control, index) => {
-                control.style.display = oldDisplays[index];
-            });
+        .catch(error => {
+
+            console.error(
+                'Monthly Bill PDF Error:',
+                error
+            );
+
+            if (
+                document.body.contains(
+                    pdfContainer
+                )
+            ) {
+
+                document.body.removeChild(
+                    pdfContainer
+                );
+
+            }
+
+            controls.forEach(
+                (control, index) => {
+
+                    control.style.display =
+                        oldDisplays[index];
+
+                }
+            );
+
+            alert(
+                'Monthly Bill PDF তৈরি করতে সমস্যা হয়েছে।'
+            );
+
         });
+
 }
 
 // ==========================================
@@ -2737,6 +4261,7 @@ function previewOldReceipt(receiptObj) {
     document.getElementById('rDate').value = receiptObj.date;
 
     document.querySelectorAll('.outName').forEach(el => el.innerText = receiptObj.name);
+    document.querySelectorAll('.outStudentId').forEach(el => el.innerText = receiptObj.studentId || '—');
     document.querySelectorAll('.outRoll').forEach(el => el.innerText = receiptObj.roll);
     document.querySelectorAll('.outClass').forEach(el => el.innerText = receiptObj.className);
     document.querySelectorAll('.outSerial').forEach(el => el.innerText = receiptObj.serial);
@@ -2805,3 +4330,202 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+/* =========================================================
+   OLD VOUCHER SEARCH
+========================================================= */
+
+function openOldVoucherSearch() {
+
+    const modal =
+        document.getElementById(
+            'oldVoucherSearchModal'
+        );
+
+    const sessionInput =
+        document.getElementById(
+            'oldVoucherSearchSession'
+        );
+
+    const dateInput =
+        document.getElementById(
+            'oldVoucherSearchDate'
+        );
+
+    const results =
+        document.getElementById(
+            'oldVoucherSearchResults'
+        );
+
+    if (!modal) return;
+
+    if (sessionInput) {
+        sessionInput.value =
+            typeof currentSession !== 'undefined'
+                ? currentSession
+                : (
+                    localStorage.getItem(
+                        'LS_CURRENT_SESSION'
+                    ) || '-'
+                );
+    }
+
+    if (dateInput) {
+        dateInput.value = '';
+    }
+
+    if (results) {
+        results.innerHTML = '';
+    }
+
+    modal.classList.remove('hidden');
+
+}
+
+
+function closeOldVoucherSearch() {
+
+    const modal =
+        document.getElementById(
+            'oldVoucherSearchModal'
+        );
+
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+
+}
+
+
+function searchOldVouchersByDate() {
+
+    const sessionInput =
+        document.getElementById(
+            'oldVoucherSearchSession'
+        );
+
+    const dateInput =
+        document.getElementById(
+            'oldVoucherSearchDate'
+        );
+
+    const results =
+        document.getElementById(
+            'oldVoucherSearchResults'
+        );
+
+    if (
+        !sessionInput ||
+        !dateInput ||
+        !results
+    ) {
+        return;
+    }
+
+    const session =
+        sessionInput.value.trim();
+
+    const selectedDate =
+        dateInput.value;
+
+    if (!selectedDate) {
+
+        alert(
+            'অনুগ্রহ করে বাউচারের তারিখ নির্বাচন করুন।'
+        );
+
+        return;
+
+    }
+
+    const stored =
+        localStorage.getItem(
+            'LS_SAVED_VOUCHERS'
+        );
+
+    let vouchers = [];
+
+    try {
+
+        vouchers =
+            stored
+                ? JSON.parse(stored)
+                : [];
+
+    }
+
+    catch (error) {
+
+        vouchers = [];
+
+    }
+
+    const matches =
+        vouchers.filter(voucher => {
+
+            return (
+                String(voucher.session) ===
+                    String(session) &&
+                voucher.date ===
+                    selectedDate
+            );
+
+        });
+
+    results.innerHTML = '';
+
+    if (!matches.length) {
+
+        results.innerHTML = `
+            <div class="text-center text-sm text-gray-500 border rounded-lg p-3">
+                এই তারিখে কোনো পুরাতন বাউচার পাওয়া যায়নি।
+            </div>
+        `;
+
+        return;
+
+    }
+
+    matches.forEach(voucher => {
+
+        const item =
+            document.createElement('button');
+
+        item.type = 'button';
+
+        item.className =
+            'w-full text-left border border-gray-200 rounded-lg p-3 hover:bg-blue-50 transition';
+
+        item.innerHTML = `
+            <div class="flex justify-between items-center">
+                <span class="font-bold text-blue-900">
+                    ${voucher.voucherNo}
+                </span>
+
+                <span class="font-bold text-gray-800">
+                    ${voucher.totalBangla || '০'} টাকা
+                </span>
+            </div>
+
+            <div class="text-xs text-gray-500 mt-1">
+                ${voucher.date}
+            </div>
+        `;
+
+        item.onclick =
+            function() {
+
+                localStorage.setItem(
+                    'LS_OPEN_OLD_VOUCHER',
+                    JSON.stringify(voucher)
+                );
+
+                window.location.href =
+                    'voucher.html';
+
+            };
+
+        results.appendChild(item);
+
+    });
+
+}
