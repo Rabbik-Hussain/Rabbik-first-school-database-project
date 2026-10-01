@@ -4328,5 +4328,35 @@
 
 </script>
 
+    <script>
+document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter') return;
+
+    const current = e.target;
+
+    if (
+        !current.matches('input, select, textarea') ||
+        current.tagName === 'TEXTAREA' ||
+        current.readOnly ||
+        current.disabled
+    ) {
+        return;
+    }
+
+    const fields = Array.from(
+        document.querySelectorAll(
+            'input:not([disabled]):not([readonly]), select:not([disabled]), textarea:not([disabled])'
+        )
+    );
+
+    const currentIndex = fields.indexOf(current);
+
+    if (currentIndex !== -1 && currentIndex < fields.length - 1) {
+        e.preventDefault();
+        fields[currentIndex + 1].focus();
+    }
+});
+</script>
+
 </body>
 </html>
