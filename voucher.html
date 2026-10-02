@@ -1296,6 +1296,128 @@
 
         }
 
+
+        /* =========================
+   VOUCHER NEXT STEP BUTTON
+========================= */
+
+.voucher-step-actions {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 22px 0;
+}
+
+#voucherNextStepBtn {
+    min-width: 180px;
+    padding: 13px 28px;
+
+    border: none;
+    border-radius: 12px;
+
+    background: rgb(121, 4, 245);
+    color: #fff;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.12);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+#voucherNextStepBtn:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 7px 18px rgba(0, 0, 0, 0.18);
+}
+
+#voucherNextStepBtn:active {
+    transform: translateY(0);
+
+    box-shadow:
+        0 3px 8px rgba(0, 0, 0, 0.12);
+}
+
+@media (max-width: 600px) {
+
+    .voucher-step-actions {
+        margin: 18px 0;
+    }
+
+    #voucherNextStepBtn {
+        width: 90%;
+        max-width: 300px;
+
+        padding: 12px 22px;
+        font-size: 15px;
+    }
+
+}
+
+
+/* =========================
+   VOUCHER EDIT STEP BUTTON
+========================= */
+
+#voucherEditStepBtn {
+    min-width: 180px;
+    padding: 13px 28px;
+
+    border: none;
+    border-radius: 12px;
+
+    background: rgb(10, 10, 251);
+    color: #fff;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.12);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+#voucherEditStepBtn:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 7px 18px rgba(0, 0, 0, 0.18);
+}
+
+#voucherEditStepBtn:active {
+    transform: translateY(0);
+
+    box-shadow:
+        0 3px 8px rgba(0, 0, 0, 0.12);
+}
+
+@media (max-width: 600px) {
+
+    #voucherEditStepBtn {
+        width: 90%;
+        max-width: 300px;
+
+        padding: 12px 22px;
+        font-size: 15px;
+    }
+
+}
+
     </style>
 </head>
 
@@ -1361,6 +1483,10 @@
                 </div>
 
             </div>
+
+
+            <!-- VOUCHER STEP 1 FORM -->
+            <form id="voucherStepForm">
 
             <!-- META -->
             <div class="meta">
@@ -1441,8 +1567,40 @@
 
             </div>
 
+            <div class="voucher-step-actions">
+
+                            <button
+                                type="button"
+                                id="voucherNextStepBtn"
+                            >
+                                পরবর্তী ধাপ
+                            </button>
+
+                        </div>
+
+                    </form>
+                    <!-- END VOUCHER STEP 1 FORM -->
+
+
+                    <!-- VOUCHER STEP EDIT BUTTON -->
+<div
+    class="voucher-step-actions"
+    id="voucherEditStepActions"
+    style="display: none;"
+>
+
+    <button
+        type="button"
+        id="voucherEditStepBtn"
+    >
+        Edit
+    </button>
+
+</div>
+<!-- END VOUCHER STEP EDIT BUTTON -->
+
             <!-- EXPENSE TABLE -->
-            <div class="table-wrap">
+            <div class="table-wrap" id="voucherExpenseTableWrap">
 
                 <table class="expense-table">
 
@@ -2423,30 +2581,63 @@
 
 
 /* =========================
-   EXPENSE COUNT CONTROL
+   VOUCHER STEP 1 → STEP 2
 ========================= */
 
 const expenseCountInput =
-    document.getElementById('expenseCount');
+    document.getElementById(
+        'expenseCount'
+    );
 
 const expenseBody =
-    document.getElementById('expenseBody');
+    document.getElementById(
+        'expenseBody'
+    );
 
+const voucherStepForm =
+    document.getElementById(
+        'voucherStepForm'
+    );
+
+const voucherNextStepBtn =
+    document.getElementById(
+        'voucherNextStepBtn'
+    );
+
+const voucherExpenseTableWrap =
+    document.getElementById(
+        'voucherExpenseTableWrap'
+    );
+
+
+/*
+    Voucher page load হলে
+    Expense Table hidden থাকবে।
+*/
+
+if (voucherExpenseTableWrap) {
+
+    voucherExpenseTableWrap.style.display =
+        'none';
+
+}
+
+
+/* =========================
+   NEXT STEP
+========================= */
 
 if (
+    voucherNextStepBtn &&
     expenseCountInput &&
-    expenseBody
+    expenseBody &&
+    voucherStepForm &&
+    voucherExpenseTableWrap
 ) {
 
-    expenseCountInput.addEventListener(
-        'keydown',
-        function (event) {
-
-            if (event.key !== 'Enter') {
-                return;
-            }
-
-            event.preventDefault();
+    voucherNextStepBtn.addEventListener(
+        'click',
+        function () {
 
             let count =
                 parseInt(
@@ -2462,6 +2653,10 @@ if (
             }
 
 
+            /*
+                বর্তমানে থাকা Expense Row সংগ্রহ
+            */
+
             let rows =
                 expenseBody.querySelectorAll(
                     '.expense-row'
@@ -2473,7 +2668,9 @@ if (
                 অতিরিক্ত row মুছে দেবে।
             */
 
-            while (rows.length > count) {
+            while (
+                rows.length > count
+            ) {
 
                 rows[rows.length - 1].remove();
 
@@ -2481,6 +2678,7 @@ if (
                     expenseBody.querySelectorAll(
                         '.expense-row'
                     );
+
             }
 
 
@@ -2489,7 +2687,9 @@ if (
                 প্রয়োজনীয় সংখ্যক row তৈরি করবে।
             */
 
-            while (rows.length < count) {
+            while (
+                rows.length < count
+            ) {
 
                 addExpenseRow();
 
@@ -2497,39 +2697,114 @@ if (
                     expenseBody.querySelectorAll(
                         '.expense-row'
                     );
+
             }
 
 
+            /*
+                Total আবার হিসাব হবে।
+            */
+
             updateTotal();
+
+
+            /*
+                Step 1 Form hide হবে।
+            */
+
+            voucherStepForm.style.display =
+                'none';
+
+
+            /*
+                Expense Table show হবে।
+            */
+
+            voucherExpenseTableWrap.style.display =
+                '';
 
         }
     );
 
+}
 
-    /*
-        Amount input-এ Enter চাপলে
-        আর নতুন Expense Row তৈরি হবে না।
-    */
 
-    expenseBody.addEventListener(
-        'keydown',
-        function (event) {
+/* =========================
+   VOUCHER STEP EDIT
+========================= */
 
-            if (
-                event.key === 'Enter' &&
-                event.target.classList.contains(
-                    'amount-input'
-                )
-            ) {
+const voucherEditStepActions =
+    document.getElementById(
+        'voucherEditStepActions'
+    );
 
-                event.preventDefault();
+const voucherEditStepBtn =
+    document.getElementById(
+        'voucherEditStepBtn'
+    );
 
-                event.stopPropagation();
 
-            }
+/* =========================
+   SHOW EDIT BUTTON
+========================= */
 
-        },
-        true
+if (
+    voucherEditStepActions &&
+    voucherNextStepBtn
+) {
+
+    voucherNextStepBtn.addEventListener(
+        'click',
+        function () {
+
+            voucherEditStepActions.style.display =
+                'flex';
+
+        }
+    );
+
+}
+
+
+/* =========================
+   EDIT STEP 1
+========================= */
+
+if (
+    voucherEditStepBtn &&
+    voucherEditStepActions &&
+    voucherStepForm &&
+    voucherExpenseTableWrap
+) {
+
+    voucherEditStepBtn.addEventListener(
+        'click',
+        function () {
+
+            /*
+                Expense Table hide হবে
+            */
+
+            voucherExpenseTableWrap.style.display =
+                'none';
+
+
+            /*
+                Step 1 Form আবার show হবে
+            */
+
+            voucherStepForm.style.display =
+                '';
+
+
+            /*
+                Edit Button hide হবে
+            */
+
+            voucherEditStepActions.style.display =
+                'none';
+
+        }
     );
 
 }
@@ -3433,6 +3708,63 @@ if (
     function loadOldVoucher(voucher) {
 
         oldVoucherMode = true;
+
+        /* =========================
+       OLD VOUCHER MODE
+       NEW STEP SYSTEM HIDDEN
+    ========================= */
+
+    const oldVoucherStepForm =
+        document.getElementById(
+            'voucherStepForm'
+        );
+
+    const oldVoucherTableWrap =
+        document.getElementById(
+            'voucherExpenseTableWrap'
+        );
+
+    const oldVoucherEditStepActions =
+        document.getElementById(
+            'voucherEditStepActions'
+        );
+
+
+    /*
+        Old Voucher হলে
+        Step-1 Form থাকবে না
+    */
+
+    if (oldVoucherStepForm) {
+
+        oldVoucherStepForm.style.display =
+            'none';
+
+    }
+
+
+    /*
+        Expense Table সরাসরি দেখা যাবে
+    */
+
+    if (oldVoucherTableWrap) {
+
+        oldVoucherTableWrap.style.display =
+            '';
+
+    }
+
+
+    /*
+        New Voucher-এর Edit Button থাকবে না
+    */
+
+    if (oldVoucherEditStepActions) {
+
+        oldVoucherEditStepActions.style.display =
+            'none';
+
+    }
 
         voucherUpdateMode = false;
 
