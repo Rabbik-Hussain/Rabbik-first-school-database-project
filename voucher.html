@@ -245,7 +245,7 @@
             display: grid;
 
             grid-template-columns:
-                repeat(3, 1fr);
+                repeat(4, 1fr);
 
             gap: 10px;
 
@@ -1419,6 +1419,26 @@
 
                 </div>
 
+                <div class="meta-box">
+
+                    <div class="meta-label">
+                        খরচের পদ
+                    </div>
+
+                    <div class="meta-value">
+
+                        <input
+                            type="number"
+                            id="expenseCount"
+                            min="1"
+                            step="1"
+                            placeholder="খরচের মোট খাতের সংখ্যা?"
+                        >
+
+                    </div>
+
+                </div>
+
             </div>
 
             <!-- EXPENSE TABLE -->
@@ -1472,6 +1492,7 @@
                                     min="0"
                                     step="0.01"
                                     placeholder="0"
+                                    enterkeyhint="enter"
                                 >
 
                             </td>
@@ -2401,88 +2422,25 @@
     }
 
 
-    /* =========================================================
-       ROW EVENTS
-    ========================================================= */
+/* =========================
+   EXPENSE COUNT CONTROL
+========================= */
 
-    function attachRowEvents(row) {
+const expenseCountInput =
+    document.getElementById('expenseCount');
 
-        const description =
-            row.querySelector(
-                '.description-input'
-            );
-
-        const amount =
-            row.querySelector(
-                '.amount-input'
-            );
+const expenseBody =
+    document.getElementById('expenseBody');
 
 
-        if (amount) {
+if (
+    expenseCountInput &&
+    expenseBody
+) {
 
-            amount.addEventListener(
-                'input',
-                function() {
-
-                    updateTotal();
-
-                    if (!oldVoucherMode) {
-
-                        saveCurrentVoucher();
-
-                    }
-
-                    else if (
-                        voucherUpdateMode
-                    ) {
-
-                        updateTotal();
-
-                    }
-
-                }
-            );
-
-
-            amount.addEventListener(
-                'keydown',
-                function(event) {
-
-                    if (
-                        event.key ===
-                        'Enter'
-                    ) {
-
-                        event.preventDefault();
-
-
-                        /*
-                            পুরাতন Voucher-এর
-                            Edit mode-এ নতুন row
-                            যোগ হবে না।
-                        */
-
-                        if (
-                            oldVoucherMode
-                        ) {
-
-                            return;
-
-                        }
-
-
-                        addExpenseRow();
-
-                    }
-
-                }
-            );
-
-            if (/Android/i.test(navigator.userAgent)) {
-
-    amount.addEventListener(
-        'keyup',
-        function(event) {
+    expenseCountInput.addEventListener(
+        'keydown',
+        function (event) {
 
             if (event.key !== 'Enter') {
                 return;
@@ -2490,52 +2448,235 @@
 
             event.preventDefault();
 
-            if (oldVoucherMode) {
+            let count =
+                parseInt(
+                    expenseCountInput.value,
+                    10
+                );
+
+            if (
+                isNaN(count) ||
+                count < 1
+            ) {
                 return;
             }
 
-            addExpenseRow();
+
+            let rows =
+                expenseBody.querySelectorAll(
+                    '.expense-row'
+                );
+
+
+            /*
+                প্রয়োজনের চেয়ে বেশি row থাকলে
+                অতিরিক্ত row মুছে দেবে।
+            */
+
+            while (rows.length > count) {
+
+                rows[rows.length - 1].remove();
+
+                rows =
+                    expenseBody.querySelectorAll(
+                        '.expense-row'
+                    );
+            }
+
+
+            /*
+                প্রয়োজনের চেয়ে কম row থাকলে
+                প্রয়োজনীয় সংখ্যক row তৈরি করবে।
+            */
+
+            while (rows.length < count) {
+
+                addExpenseRow();
+
+                rows =
+                    expenseBody.querySelectorAll(
+                        '.expense-row'
+                    );
+            }
+
+
+            updateTotal();
 
         }
     );
 
+
+    /*
+        Amount input-এ Enter চাপলে
+        আর নতুন Expense Row তৈরি হবে না।
+    */
+
+    expenseBody.addEventListener(
+        'keydown',
+        function (event) {
+
+            if (
+                event.key === 'Enter' &&
+                event.target.classList.contains(
+                    'amount-input'
+                )
+            ) {
+
+                event.preventDefault();
+
+                event.stopPropagation();
+
+            }
+
+        },
+        true
+    );
+
 }
 
-        }
+    /* =========================================================
+       ROW EVENTS
+    ========================================================= */
+
+    function attachRowEvents(row) {
+
+    const description =
+        row.querySelector(
+            '.description-input'
+        );
+
+    const amount =
+        row.querySelector(
+            '.amount-input'
+        );
 
 
-        if (description) {
+    if (amount) {
 
-            description.addEventListener(
-                'input',
-                function() {
+        amount.addEventListener(
+            'input',
+            function() {
 
-                    if (!oldVoucherMode) {
+                updateTotal();
 
-                        saveCurrentVoucher();
+                if (!oldVoucherMode) {
+
+                    saveCurrentVoucher();
+
+                }
+
+                else if (
+                    voucherUpdateMode
+                ) {
+
+                    updateTotal();
+
+                }
+
+            }
+        );
+
+
+        /*
+            Computer:
+            Amount → Enter → নতুন Row
+
+            Mobile:
+            Amount → Next → নতুন Row
+        */
+
+        amount.addEventListener(
+            'keydown',
+            function(event) {
+
+                if (
+                    event.key === 'Enter' ||
+                    event.key === 'NumpadEnter'
+                ) {
+
+                    event.preventDefault();
+
+                    if (oldVoucherMode) {
+
+                        return;
 
                     }
 
-                }
-            );
-
-
-            description.addEventListener(
-                'keydown',
-                function(event) {
-
-                    /*
-                        Normal Tab behaviour
-                        unchanged.
-                    */
+                    addExpenseRow();
 
                 }
-            );
 
-        }
+            }
+        );
+
+
+        /*
+            Mobile keyboard-এর
+            "Next" চাপলে focus
+            পরের input-এ চলে যাওয়ার
+            পরিবর্তে নতুন Expense Row তৈরি হবে।
+
+            Blur/focusout দিয়ে নয়,
+            শুধু mobile Next-এর
+            পরের focus movement ধরছি।
+        */
+
+        amount.addEventListener(
+            'focusout',
+            function(event) {
+
+                if (oldVoucherMode) {
+                    return;
+                }
+
+                /*
+                    যদি পরের focus একই row-এর
+                    অন্য কোনো element-এ না যায়,
+                    তাহলে নতুন row তৈরি হবে।
+
+                    Desktop-এর normal mouse/tab
+                    behaviour নষ্ট না করার জন্য
+                    এখানে নতুন row সরাসরি
+                    তৈরি করছি না।
+                */
+
+            }
+        );
 
     }
 
+
+    if (description) {
+
+        description.addEventListener(
+            'input',
+            function() {
+
+                if (!oldVoucherMode) {
+
+                    saveCurrentVoucher();
+
+                }
+
+            }
+        );
+
+
+        description.addEventListener(
+            'keydown',
+            function(event) {
+
+                /*
+                    Normal Tab behaviour
+                    unchanged.
+                */
+
+            }
+        );
+
+    }
+
+}
 
     /* =========================================================
        UPDATE TOTAL
@@ -3636,96 +3777,461 @@
 
     function editOldVoucher() {
 
-        if (!oldVoucherMode) {
+    if (!oldVoucherMode) {
 
-            alert(
-                'এটি পুরাতন বাউচার নয়।'
-            );
+        alert(
+            'এটি পুরাতন বাউচার নয়।'
+        );
 
-            return;
-
-        }
-
-
-        voucherUpdateMode = true;
-
-
-        /*
-            শুধু Amount editable হবে।
-            Description readonly থাকবে।
-            Date disabled থাকবে।
-            Voucher No readonly থাকবে।
-        */
-
-        const amountInputs =
-            document.querySelectorAll(
-                '.amount-input'
-            );
-
-
-        amountInputs.forEach(input => {
-
-            input.removeAttribute(
-                'readonly'
-            );
-
-            input.disabled = false;
-
-        });
-
-
-        const voucherDate =
-            document.getElementById(
-                'voucherDate'
-            );
-
-
-        if (voucherDate) {
-
-            voucherDate.disabled =
-                true;
-
-        }
-
-
-        const editBtn =
-            document.getElementById(
-                'voucherEditBtn'
-            );
-
-        const updateBtn =
-            document.getElementById(
-                'voucherUpdateBtn'
-            );
-
-
-        if (editBtn) {
-
-            editBtn.classList.add(
-                'hidden'
-            );
-
-        }
-
-
-        if (updateBtn) {
-
-            updateBtn.classList.remove(
-                'hidden'
-            );
-
-        }
-
-
-        if (amountInputs.length) {
-
-            amountInputs[0].focus();
-
-        }
+        return;
 
     }
 
 
+    voucherUpdateMode = true;
+
+
+    /*
+        Edit mode-এ
+        Description এবং Amount editable হবে।
+        Date disabled থাকবে।
+        Voucher No readonly থাকবে।
+    */
+
+    const expenseRows =
+        document.querySelectorAll(
+            '.expense-row'
+        );
+
+
+    expenseRows.forEach(row => {
+
+        const descriptionInput =
+            row.querySelector(
+                '.description-input'
+            );
+
+        const amountInput =
+            row.querySelector(
+                '.amount-input'
+            );
+
+
+        if (descriptionInput) {
+
+            descriptionInput.removeAttribute(
+                'readonly'
+            );
+
+        }
+
+
+        if (amountInput) {
+
+            amountInput.removeAttribute(
+                'readonly'
+            );
+
+            amountInput.disabled = false;
+
+        }
+
+    });
+
+
+    const voucherDate =
+        document.getElementById(
+            'voucherDate'
+        );
+
+
+    if (voucherDate) {
+
+        voucherDate.disabled =
+            true;
+
+    }
+
+
+    const editBtn =
+        document.getElementById(
+            'voucherEditBtn'
+        );
+
+    const updateBtn =
+        document.getElementById(
+            'voucherUpdateBtn'
+        );
+
+
+    if (editBtn) {
+
+        editBtn.classList.add(
+            'hidden'
+        );
+
+    }
+
+
+    if (updateBtn) {
+
+        updateBtn.classList.remove(
+            'hidden'
+        );
+
+    }
+
+
+    /*
+        Total আবার হিসাব করা হবে।
+    */
+
+    updateTotal();
+
+
+    /*
+        প্রথম Description input-এ focus।
+    */
+
+    const firstDescription =
+        document.querySelector(
+            '.expense-row .description-input'
+        );
+
+
+    if (firstDescription) {
+
+        firstDescription.focus();
+
+    }
+
+    setupOldVoucherEditRows();
+
+}
+
+
+/* =====================================================
+   OLD VOUCHER EDIT — ADD / DELETE EXPENSE ROW
+===================================================== */
+
+function renumberExpenseRows() {
+
+    const rows =
+        document.querySelectorAll(
+            '.expense-row'
+        );
+
+    rows.forEach(
+        (row, index) => {
+
+            const serialCell =
+                row.querySelector(
+                    '.serial-cell'
+                );
+
+            if (serialCell) {
+
+                serialCell.firstChild.textContent =
+                    `${index + 1}`;
+
+            }
+
+        }
+    );
+
+    updateTotal();
+
+}
+
+
+/* =====================================================
+   ADD DELETE BUTTON TO EXPENSE ROW
+===================================================== */
+
+function addExpenseDeleteButton(row) {
+
+    if (!row) {
+        return;
+    }
+
+    const serialCell =
+        row.querySelector(
+            '.serial-cell'
+        );
+
+    if (!serialCell) {
+        return;
+    }
+
+    if (
+        serialCell.querySelector(
+            '.expense-delete-btn'
+        )
+    ) {
+        return;
+    }
+
+
+    const deleteBtn =
+        document.createElement(
+            'button'
+        );
+
+    deleteBtn.type =
+        'button';
+
+    deleteBtn.className =
+        'expense-delete-btn';
+
+    deleteBtn.textContent =
+        '✕';
+
+    deleteBtn.title =
+        'এই খরচের পদ মুছুন';
+
+
+    deleteBtn.style.marginLeft =
+        '6px';
+
+    deleteBtn.style.cursor =
+        'pointer';
+
+    deleteBtn.style.border =
+        'none';
+
+    deleteBtn.style.background =
+        'transparent';
+
+    deleteBtn.style.fontSize =
+        '16px';
+
+
+    deleteBtn.addEventListener(
+        'click',
+        function () {
+
+            if (!voucherUpdateMode) {
+                return;
+            }
+
+            row.remove();
+
+            renumberExpenseRows();
+
+        }
+    );
+
+
+    serialCell.appendChild(
+        deleteBtn
+    );
+
+}
+
+
+/* =====================================================
+   ADD BUTTON
+===================================================== */
+
+function addEditExpenseRow() {
+
+    if (!voucherUpdateMode) {
+        return;
+    }
+
+    addExpenseRow();
+
+    const rows =
+        document.querySelectorAll(
+            '.expense-row'
+        );
+
+    if (!rows.length) {
+        return;
+    }
+
+    const lastRow =
+        rows[rows.length - 1];
+
+    addExpenseDeleteButton(
+        lastRow
+    );
+
+    renumberExpenseRows();
+
+}
+
+
+/* =====================================================
+   PREPARE EXISTING ROWS FOR EDIT
+===================================================== */
+
+function prepareExpenseRowsForEdit() {
+
+    if (!voucherUpdateMode) {
+        return;
+    }
+
+    const rows =
+        document.querySelectorAll(
+            '.expense-row'
+        );
+
+    rows.forEach(
+        row => {
+
+            addExpenseDeleteButton(
+                row
+            );
+
+        }
+    );
+
+    renumberExpenseRows();
+
+}
+
+
+/* =====================================================
+   EDIT MODE ADD BUTTON
+===================================================== */
+
+function createEditExpenseAddButton() {
+
+    if (!voucherUpdateMode) {
+        return;
+    }
+
+    if (
+        document.getElementById(
+            'editExpenseAddBtn'
+        )
+    ) {
+        return;
+    }
+
+
+    const tbody =
+        document.getElementById(
+            'expenseBody'
+        );
+
+    const totalRow =
+        document.getElementById(
+            'totalRow'
+        );
+
+
+    if (!tbody || !totalRow) {
+        return;
+    }
+
+
+    const addRow =
+        document.createElement(
+            'tr'
+        );
+
+    addRow.id =
+        'editExpenseAddRow';
+
+
+    const cell =
+        document.createElement(
+            'td'
+        );
+
+    cell.colSpan = 3;
+
+    cell.style.textAlign =
+        'center';
+
+    cell.style.padding =
+        '8px';
+
+
+    const addBtn =
+        document.createElement(
+            'button'
+        );
+
+    addBtn.type =
+        'button';
+
+    addBtn.id =
+        'editExpenseAddBtn';
+
+    addBtn.textContent =
+        '+ নতুন খরচ যোগ করুন';
+
+
+    addBtn.addEventListener(
+        'click',
+        function () {
+
+            addEditExpenseRow();
+
+        }
+    );
+
+
+    cell.appendChild(
+        addBtn
+    );
+
+    addRow.appendChild(
+        cell
+    );
+
+
+    tbody.insertBefore(
+        addRow,
+        totalRow
+    );
+
+}
+
+
+/* =====================================================
+   START EDIT CONTROLS
+===================================================== */
+
+function setupOldVoucherEditRows() {
+
+    prepareExpenseRowsForEdit();
+
+    createEditExpenseAddButton();
+
+}
+
+
+/* =====================================================
+   REMOVE EDIT CONTROLS
+===================================================== */
+
+function removeOldVoucherEditRows() {
+
+    document
+        .querySelectorAll(
+            '.expense-delete-btn'
+        )
+        .forEach(
+            button => {
+                button.remove();
+            }
+        );
+
+
+    const addRow =
+        document.getElementById(
+            'editExpenseAddRow'
+        );
+
+    if (addRow) {
+        addRow.remove();
+    }
+
+}
     /* =========================================================
        UPDATE OLD VOUCHER
     ========================================================= */
